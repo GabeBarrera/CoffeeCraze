@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#2a1d14;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  @keyframes steam{0%{opacity:0;transform:translateY(0) scaleX(1)}40%{opacity:.6}100%{opacity:0;transform:translateY(-18px) scaleX(1.4)}}
+  @keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
+  @keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:#8a6a4f;border:2px solid #3b2a1f}
+  a{color:#8a5a2b}a:hover{color:#6f4e37}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(45deg,#2a1d14,#2a1d14 14px,#291c13 14px,#291c13 28px);font-family:'VT323',monospace;">
+  <div style="position:relative;width:100%;max-width:460px;height:100vh;max-height:900px;display:flex;flex-direction:column;background:#f3e9dc;border-left:4px solid #3b2a1f;border-right:4px solid #3b2a1f;overflow:hidden;">
+
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#6f4e37;border-bottom:4px solid #3b2a1f;color:#f3e9dc;">
+      <div style="display:flex;flex-direction:column;line-height:1;">
+        <span style="font-family:'Press Start 2P';font-size:8px;color:#c8a97e;">CASH</span>
+        <span style="font-family:'Press Start 2P';font-size:13px;margin-top:4px;">${{ money }}</span>
+      </div>
+      <div style="width:3px;height:30px;background:#3b2a1f;"></div>
+      <div style="display:flex;flex-direction:column;line-height:1;">
+        <span style="font-family:'Press Start 2P';font-size:8px;color:#c8a97e;">DAY</span>
+        <span style="font-family:'Press Start 2P';font-size:13px;margin-top:4px;">{{ day }}</span>
+      </div>
+      <div style="width:3px;height:30px;background:#3b2a1f;"></div>
+      <div style="display:flex;flex-direction:column;line-height:1;">
+        <span style="font-family:'Press Start 2P';font-size:8px;color:#c8a97e;">REP</span>
+        <span style="font-family:'Press Start 2P';font-size:13px;margin-top:4px;color:#f2c14e;">{{ repStars }}</span>
+      </div>
+      <div style="flex:1;"></div>
+      <sc-if value="{{ lowStock }}" hint-placeholder-val="{{ false }}">
+        <span style="font-family:'Press Start 2P';font-size:8px;background:#bc4b51;color:#fff;padding:5px 6px;border:2px solid #3b2a1f;">LOW STOCK</span>
+      </sc-if>
+      <button onClick="{{ toggleMute }}" style="font-family:'VT323';font-size:18px;background:#c8a97e;border:3px solid #3b2a1f;color:#3b2a1f;width:34px;height:34px;cursor:pointer;padding:0;">{{ muteLabel }}</button>
+      <button onClick="{{ toggleOpen }}" style="font-family:'Press Start 2P';font-size:8px;background:{{ openBtnBg }};border:3px solid #3b2a1f;color:#fff;height:34px;padding:0 7px;cursor:pointer;">{{ openLabel }}</button>
+      <button onClick="{{ reset }}" style="font-family:'Press Start 2P';font-size:8px;background:#c8a97e;border:3px solid #3b2a1f;color:#3b2a1f;height:34px;padding:0 8px;cursor:pointer;">NEW</button>
+    </div>
+
+    <div style="position:relative;height:200px;flex-shrink:0;background:linear-gradient(#e8c9a0 0%,#e8c9a0 62%,#8a6a4f 62%,#8a6a4f 100%);border-bottom:4px solid #3b2a1f;overflow:hidden;">
+      <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:6;background:#1a1109;border:3px solid #3b2a1f;padding:3px 8px;display:flex;align-items:center;gap:7px;">
+        <span style="font-family:'Press Start 2P';font-size:10px;color:#f2c14e;letter-spacing:1px;">{{ clock }}</span>
+        <span style="width:9px;height:9px;background:{{ openDotColor }};border:2px solid #000;"></span>
+      </div>
+      <div style="position:absolute;top:10px;left:14px;width:46px;height:34px;background:#3b2a1f;border:3px solid #2a1d14;"></div>
+      <div style="position:absolute;top:14px;left:18px;font-family:'Press Start 2P';font-size:6px;color:#f2c14e;line-height:1.5;">OPEN<br>CAFE</div>
+      <div style="position:absolute;top:8px;right:12px;bottom:52px;width:70px;background-color:#b7d4de;background-image:repeating-linear-gradient(90deg,#2f9fbc 0 3px,transparent 3px 24px),repeating-linear-gradient(0deg,#2f9fbc 0 3px,transparent 3px 24px);border:3px solid #1f6f82;"></div>
+
+      <div style="position:absolute;left:0;right:0;bottom:0;height:78px;background:#7a5a40;border-top:5px solid #3b2a1f;"></div>
+      <div style="position:absolute;right:0;bottom:0;width:120px;height:78px;background:#5d4130;border-top:5px solid #3b2a1f;border-left:5px solid #3b2a1f;"></div>
+      <div style="position:absolute;right:16px;bottom:60px;width:22px;height:26px;background:#c8a97e;border:3px solid #3b2a1f;"></div>
+      <div style="position:absolute;right:16px;bottom:82px;width:8px;height:12px;background:#bcdce8;border:2px solid #3b2a1f;opacity:.7;"></div>
+      <div style="position:absolute;right:52px;bottom:60px;width:20px;height:16px;background:#3b2a1f;"></div>
+      <div style="position:absolute;right:54px;bottom:74px;width:16px;height:10px;background:#9c6b43;border:2px solid #3b2a1f;"></div>
+
+      <div style="position:absolute;left:8px;right:0;bottom:80px;display:flex;align-items:flex-end;gap:2px;height:110px;overflow:hidden;">
+        <sc-for list="{{ sceneQueue }}" as="c" hint-placeholder-count="0">
+          <div onClick="{{ c.onServe }}" style="position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer;animation:pop .25s ease-out;flex-shrink:0;">
+            <div style="background:#fff;border:3px solid #3b2a1f;padding:3px 5px;margin-bottom:3px;position:relative;">
+              <span style="font-family:'Press Start 2P';font-size:7px;color:#3b2a1f;white-space:nowrap;">{{ c.drinkShort }}</span>
+              <div style="width:60px;height:7px;background:#e0d3c0;border:2px solid #3b2a1f;margin-top:3px;">
+                <div style="height:100%;width:{{ c.patiencePct }}%;background:{{ c.barColor }};"></div>
+              </div>
+            </div>
+            <div style="animation:bob 1.6s ease-in-out infinite;">
+              <div style="width:20px;height:20px;background:{{ c.skin }};border:3px solid #3b2a1f;margin:0 auto;"></div>
+              <div style="width:30px;height:24px;background:{{ c.color }};border:3px solid #3b2a1f;margin-top:-3px;"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ sceneEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:10px;top:78px;font-family:'Press Start 2P';font-size:8px;color:#7a5a40;">waiting for guests...</div>
+      </sc-if>
+
+      <sc-if value="{{ closed }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;inset:0;background:rgba(42,29,20,.58);display:flex;align-items:center;justify-content:center;z-index:9;">
+          <div style="font-family:'Press Start 2P';font-size:10px;color:#f3e9dc;text-align:center;line-height:1.7;">SHOP CLOSED<br><span style="font-size:7px;color:#f2c14e;">tap OPEN to start the day</span></div>
+        </div>
+      </sc-if>
+      <div style="position:absolute;left:8px;bottom:6px;display:flex;gap:4px;z-index:2;">
+        <sc-for list="{{ decorScene }}" as="d" hint-placeholder-count="0">
+          <div style="position:relative;width:26px;height:26px;">
+            <sc-for list="{{ d.sprite }}" as="r" hint-placeholder-count="0">
+              <div style="position:absolute;left:{{ r.l }};top:{{ r.t }};width:{{ r.w }};height:{{ r.h }};background:{{ r.bg }};border:{{ r.bd }};border-radius:{{ r.r }};"></div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;padding:10px;">
+
+      <sc-if value="{{ isServe }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div style="font-family:'Press Start 2P';font-size:10px;color:#6f4e37;margin-bottom:8px;">ORDER QUEUE ({{ queueCount }})</div>
+          <sc-if value="{{ sceneEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'VT323';font-size:20px;color:#8a6a4f;padding:10px 0;">No orders right now. Buy decor to attract more guests, and keep your shelves stocked!</div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ orderList }}" as="o" hint-placeholder-count="0">
+              <button onClick="{{ o.onServe }}" style="display:flex;align-items:center;gap:10px;text-align:left;background:#fbf4e9;border:3px solid #3b2a1f;box-shadow:4px 4px 0 #3b2a1f;padding:8px;cursor:pointer;">
+                <div style="width:26px;height:26px;background:{{ o.color }};border:3px solid #3b2a1f;flex-shrink:0;"></div>
+                <div style="flex:1;">
+                  <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                    <span style="font-family:'Press Start 2P';font-size:9px;color:#3b2a1f;">{{ o.drink }}</span>
+                    <sc-for list="{{ o.mods }}" as="m" hint-placeholder-count="0">
+                      <span style="font-family:'Press Start 2P';font-size:7px;background:#e0577b;color:#fff;border:2px solid #3b2a1f;padding:2px 3px;">{{ m }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="font-family:'VT323';font-size:17px;color:#8a6a4f;line-height:1;">{{ o.want }} - ${{ o.price }}</div>
+                </div>
+                <div style="width:46px;height:10px;background:#e0d3c0;border:2px solid #3b2a1f;flex-shrink:0;"><div style="height:100%;width:{{ o.patiencePct }}%;background:{{ o.barColor }};"></div></div>
+                <span style="font-family:'Press Start 2P';font-size:8px;background:#6a994e;color:#fff;padding:6px 7px;border:2px solid #3b2a1f;">MAKE</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isShop }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="font-family:'Press Start 2P';font-size:10px;color:#6f4e37;flex:1;">{{ shopTitle }}</div>
+            <button onClick="{{ toggleShopView }}" style="font-family:'Press Start 2P';font-size:8px;background:#6f4e37;color:#f3e9dc;border:3px solid #3b2a1f;box-shadow:3px 3px 0 #3b2a1f;padding:8px 9px;cursor:pointer;">{{ shopViewBtnLabel }}</button>
+          </div>
+
+          <sc-if value="{{ shopInside }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;width:100%;height:330px;border:4px solid #3b2a1f;overflow:hidden;margin-bottom:12px;background:linear-gradient(#dcc7ab 0%,#dcc7ab 55%,#8a6a4f 55%,#8a6a4f 100%);">
+              <div style="position:absolute;left:0;right:0;top:55%;height:5px;background:#3b2a1f;"></div>
+              <div style="position:absolute;left:5%;top:11%;width:82px;height:56px;background-color:#b7d4de;background-image:repeating-linear-gradient(90deg,#2f9fbc 0 3px,transparent 3px 26px),repeating-linear-gradient(0deg,#2f9fbc 0 3px,transparent 3px 26px);border:4px solid #1f6f82;"></div>
+              <div style="position:absolute;right:5%;top:9%;width:96px;height:64px;background:#2a1d14;border:4px solid #3b2a1f;padding:6px;">
+                <sc-for list="{{ menuBoardList }}" as="mb" hint-placeholder-count="3">
+                  <div style="font-family:'Press Start 2P';font-size:6px;color:#f2c14e;line-height:1.9;">{{ mb }}</div>
+                </sc-for>
+              </div>
+              <div style="position:absolute;left:0;right:0;bottom:0;height:62px;background:#7a5a40;border-top:5px solid #3b2a1f;"></div>
+              <div style="position:absolute;left:0;right:0;bottom:54px;height:9px;background:#5d4130;"></div>
+              <div style="position:absolute;left:11%;bottom:60px;width:34px;height:26px;background:#3b2a1f;border:3px solid #2a1d14;"></div>
+              <div style="position:absolute;left:12%;bottom:80px;width:20px;height:9px;background:#bcdce8;border:2px solid #3b2a1f;"></div>
+              <div style="position:absolute;right:13%;bottom:60px;width:40px;height:28px;background:#c8a97e;border:3px solid #3b2a1f;"></div>
+              <div style="position:absolute;right:15%;bottom:60px;width:8px;height:12px;background:#3b2a1f;"></div>
+
+              <sc-for list="{{ sceneCustomers }}" as="c" hint-placeholder-count="0">
+                <div style="position:absolute;left:{{ c.left }};bottom:64px;display:flex;flex-direction:column;align-items:center;animation:pop .25s ease-out;">
+                  <div style="animation:bob 1.6s ease-in-out infinite;">
+                    <div style="width:18px;height:18px;background:{{ c.skin }};border:3px solid #3b2a1f;margin:0 auto;"></div>
+                    <div style="width:28px;height:22px;background:{{ c.color }};border:3px solid #3b2a1f;margin-top:-3px;"></div>
+                  </div>
+                </div>
+              </sc-for>
+
+              <sc-for list="{{ sceneSpots }}" as="sp" hint-placeholder-count="0">
+                <div onClick="{{ sp.onClick }}" style="position:absolute;left:{{ sp.left }};top:{{ sp.top }};width:{{ sp.w }};height:{{ sp.h }};cursor:{{ sp.cursor }};">
+                  <sc-for list="{{ sp.sprite }}" as="r" hint-placeholder-count="0">
+                    <div style="position:absolute;left:{{ r.l }};top:{{ r.t }};width:{{ r.w }};height:{{ r.h }};background:{{ r.bg }};border:{{ r.bd }};border-radius:{{ r.r }};"></div>
+                  </sc-for>
+                  <sc-if value="{{ sp.showLabel }}" hint-placeholder-val="{{ true }}">
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:3px dashed #f3e9dc;background:rgba(243,233,220,0.14);text-align:center;">
+                      <span style="font-family:'Press Start 2P';font-size:6px;color:#f3e9dc;line-height:1.4;">{{ sp.tag }}</span>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+
+              <sc-if value="{{ closed }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);font-family:'Press Start 2P';font-size:7px;color:#fff;background:#bc4b51;border:2px solid #3b2a1f;padding:4px 6px;">CLOSED - no guests</div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ shopOutside }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;width:100%;height:330px;border:4px solid #3b2a1f;overflow:hidden;margin-bottom:12px;background-color:#a3512f;background-image:repeating-linear-gradient(0deg,transparent 0 14px,rgba(56,20,10,.5) 14px 16px),repeating-linear-gradient(90deg,transparent 0 42px,rgba(56,20,10,.38) 42px 44px);">
+
+              <div style="position:absolute;left:2%;right:2%;top:6%;height:15%;background:#f1e9dc;border:4px solid #3b2a1f;box-shadow:0 4px 0 rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0 8px;">
+                <input value="{{ storeNameVal }}" onChange="{{ onStoreName }}" maxLength="20" spellcheck="false" style="width:100%;text-align:center;background:transparent;border:none;outline:none;font-family:'Press Start 2P';font-size:13px;color:#2a1d14;letter-spacing:2px;text-transform:uppercase;" />
+              </div>
+              <div style="position:absolute;left:0;right:0;top:21.5%;text-align:center;font-family:'VT323';font-size:13px;color:#f1e9dc;pointer-events:none;">tap the sign to rename your cafe</div>
+
+              <div style="position:absolute;left:4%;right:4%;top:26%;bottom:16%;background:#2fa3bf;border:5px solid #1f6f82;"></div>
+              <div style="position:absolute;left:6%;right:6%;top:28%;height:6%;background-color:#bcd8e2;background-image:repeating-linear-gradient(90deg,#1f6f82 0 3px,transparent 3px 26px);border:3px solid #1f6f82;"></div>
+
+              <div style="position:absolute;left:6%;width:26%;top:35%;bottom:20%;background-color:#b7d4de;background-image:repeating-linear-gradient(90deg,#2f9fbc 0 3px,transparent 3px 30px),repeating-linear-gradient(0deg,#2f9fbc 0 3px,transparent 3px 30px);border:4px solid #1f6f82;"></div>
+              <div style="position:absolute;right:6%;width:26%;top:35%;bottom:20%;background-color:#b7d4de;background-image:repeating-linear-gradient(90deg,#2f9fbc 0 3px,transparent 3px 30px),repeating-linear-gradient(0deg,#2f9fbc 0 3px,transparent 3px 30px);border:4px solid #1f6f82;"></div>
+
+              <div style="position:absolute;left:15%;top:36%;width:2px;height:16px;background:#1f6f82;"></div>
+              <div style="position:absolute;left:13%;top:41%;width:12px;height:12px;background:#f2c14e;border:2px solid #3b2a1f;border-radius:50%;box-shadow:0 0 8px #f2c14e;"></div>
+              <div style="position:absolute;right:15%;top:36%;width:2px;height:16px;background:#1f6f82;"></div>
+              <div style="position:absolute;right:13%;top:41%;width:12px;height:12px;background:#f2c14e;border:2px solid #3b2a1f;border-radius:50%;box-shadow:0 0 8px #f2c14e;"></div>
+
+              <div style="position:absolute;left:38%;width:24%;top:30%;bottom:16%;background:#2fa3bf;border:5px solid #1f6f82;border-radius:44% 44% 0 0;"></div>
+              <div style="position:absolute;left:41.5%;width:17%;top:35%;bottom:16%;background:linear-gradient(#2a1d14,#5d4130);border:3px solid #1f6f82;border-radius:38% 38% 0 0;"></div>
+              <div style="position:absolute;left:44%;width:12%;bottom:16%;top:58%;background:#c8a97e;opacity:.45;"></div>
+              <div style="position:absolute;left:50%;top:40%;transform:translateX(-50%);font-family:'Press Start 2P';font-size:6px;color:#fff;background:{{ signBg }};border:2px solid #3b2a1f;padding:3px 4px;">{{ signText }}</div>
+
+              <div style="position:absolute;left:0;right:0;bottom:0;height:16%;background:#b7ab98;border-top:4px solid #3b2a1f;background-image:repeating-linear-gradient(90deg,transparent 0 40px,rgba(0,0,0,.12) 40px 42px);"></div>
+
+              <sc-for list="{{ sceneSpots }}" as="sp" hint-placeholder-count="0">
+                <div onClick="{{ sp.onClick }}" style="position:absolute;left:{{ sp.left }};top:{{ sp.top }};width:{{ sp.w }};height:{{ sp.h }};cursor:{{ sp.cursor }};">
+                  <sc-for list="{{ sp.sprite }}" as="r" hint-placeholder-count="0">
+                    <div style="position:absolute;left:{{ r.l }};top:{{ r.t }};width:{{ r.w }};height:{{ r.h }};background:{{ r.bg }};border:{{ r.bd }};border-radius:{{ r.r }};"></div>
+                  </sc-for>
+                  <sc-if value="{{ sp.showLabel }}" hint-placeholder-val="{{ true }}">
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:3px dashed #f3e9dc;background:rgba(243,233,220,0.18);text-align:center;">
+                      <span style="font-family:'Press Start 2P';font-size:6px;color:#f3e9dc;line-height:1.4;">{{ sp.tag }}</span>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <div style="font-family:'VT323';font-size:16px;color:#8a6a4f;line-height:1.05;margin-bottom:12px;">{{ placeHint }}</div>
+
+          <div style="font-family:'Press Start 2P';font-size:10px;color:#6f4e37;margin-bottom:8px;">DECOR SHOP</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ furnitureList }}" as="f" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;gap:10px;background:#fbf4e9;border:3px solid #3b2a1f;box-shadow:4px 4px 0 #3b2a1f;padding:8px;">
+                <div style="position:relative;width:30px;height:30px;flex-shrink:0;">
+                  <sc-for list="{{ f.sprite }}" as="r" hint-placeholder-count="0">
+                    <div style="position:absolute;left:{{ r.l }};top:{{ r.t }};width:{{ r.w }};height:{{ r.h }};background:{{ r.bg }};border:{{ r.bd }};border-radius:{{ r.r }};"></div>
+                  </sc-for>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-family:'Press Start 2P';font-size:9px;color:#3b2a1f;">{{ f.name }}</div>
+                  <div style="font-family:'VT323';font-size:16px;color:#8a6a4f;line-height:1;">{{ f.effect }}</div>
+                </div>
+                <button onClick="{{ f.onBuy }}" style="font-family:'Press Start 2P';font-size:8px;background:{{ f.btnBg }};color:{{ f.btnFg }};border:3px solid #3b2a1f;padding:7px 8px;cursor:pointer;">${{ f.cost }}</button>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="font-family:'Press Start 2P';font-size:10px;color:#6f4e37;margin:16px 0 8px;">UPGRADES</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ upgradeList }}" as="u" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:10px;background:{{ u.cardBg }};border:3px solid #3b2a1f;box-shadow:4px 4px 0 #3b2a1f;padding:8px;">
+                <div style="flex:1;">
+                  <div style="font-family:'Press Start 2P';font-size:9px;color:#3b2a1f;">{{ u.name }}</div>
+                  <div style="font-family:'VT323';font-size:16px;color:#8a6a4f;line-height:1;">{{ u.desc }}</div>
+                </div>
+                <button onClick="{{ u.onBuy }}" style="font-family:'Press Start 2P';font-size:8px;background:{{ u.btnBg }};color:{{ u.btnFg }};border:3px solid #3b2a1f;padding:7px 8px;cursor:pointer;">{{ u.btnLabel }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSupplies }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="font-family:'Press Start 2P';font-size:10px;color:#6f4e37;margin-bottom:8px;">STOCK ROOM</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ supplyList }}" as="s" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:10px;background:#fbf4e9;border:3px solid #3b2a1f;box-shadow:4px 4px 0 #3b2a1f;padding:8px;">
+                <div style="width:26px;height:26px;background:{{ s.color }};border:3px solid #3b2a1f;flex-shrink:0;"></div>
+                <div style="flex:1;">
+                  <div style="font-family:'Press Start 2P';font-size:9px;color:{{ s.nameColor }};">{{ s.name }}</div>
+                  <div style="font-family:'VT323';font-size:16px;color:#8a6a4f;line-height:1;">in stock: {{ s.stock }}</div>
+                </div>
+                <button onClick="{{ s.onBuy }}" style="font-family:'Press Start 2P';font-size:8px;background:{{ s.btnBg }};color:{{ s.btnFg }};border:3px solid #3b2a1f;padding:7px 8px;cursor:pointer;text-align:center;line-height:1.6;">+{{ s.pack }}<br>${{ s.cost }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isMenu }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="font-family:'Press Start 2P';font-size:10px;color:#6f4e37;margin-bottom:8px;">OUR MENU</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ menuList }}" as="d" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:10px;background:{{ d.bg }};border:3px solid #3b2a1f;box-shadow:4px 4px 0 #3b2a1f;padding:8px;">
+                <div style="width:22px;height:26px;background:#efe3cf;border:3px solid #3b2a1f;border-radius:0 0 6px 6px;flex-shrink:0;position:relative;overflow:hidden;">
+                  <div style="position:absolute;left:0;right:0;bottom:0;height:62%;background:{{ d.color }};"></div>
+                </div>
+                <div style="flex:1;">
+                  <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                    <span style="font-family:'Press Start 2P';font-size:9px;color:#3b2a1f;">{{ d.name }}</span>
+                    <sc-if value="{{ d.custom }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-family:'Press Start 2P';font-size:6px;background:#e0577b;color:#fff;border:2px solid #3b2a1f;padding:2px 3px;">CUSTOM</span>
+                    </sc-if>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;">
+                    <sc-for list="{{ d.chips }}" as="ch" hint-placeholder-count="3">
+                      <span style="display:flex;align-items:center;gap:3px;font-family:'VT323';font-size:13px;color:#6f4e37;background:#f3e9dc;border:2px solid #3b2a1f;padding:0 4px;"><span style="width:8px;height:8px;background:{{ ch.color }};border:1px solid #3b2a1f;"></span>{{ ch.label }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+                  <span style="font-family:'Press Start 2P';font-size:10px;color:#6a994e;">${{ d.price }}</span>
+                  <sc-if value="{{ d.custom }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ d.onDelete }}" style="font-family:'Press Start 2P';font-size:7px;background:#bc4b51;color:#fff;border:2px solid #3b2a1f;padding:4px 5px;cursor:pointer;">DEL</button>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="font-family:'Press Start 2P';font-size:10px;color:#6f4e37;margin:16px 0 8px;">CREATE A DRINK</div>
+          <div style="background:#fbf4e9;border:3px solid #3b2a1f;box-shadow:4px 4px 0 #3b2a1f;padding:10px;">
+            <div style="font-family:'Press Start 2P';font-size:7px;color:#8a6a4f;margin-bottom:4px;">DRINK NAME</div>
+            <input value="{{ draftName }}" onChange="{{ onDraftName }}" maxLength="18" placeholder="Signature Latte" style="width:100%;font-family:'VT323';font-size:20px;color:#3b2a1f;background:#fff;border:3px solid #3b2a1f;padding:4px 6px;margin-bottom:10px;outline:none;" />
+
+            <div style="font-family:'Press Start 2P';font-size:7px;color:#8a6a4f;margin-bottom:4px;">RECIPE (tap ingredients in order)</div>
+            <div style="min-height:38px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;background:#fff;border:3px solid #3b2a1f;padding:6px;margin-bottom:8px;">
+              <sc-if value="{{ draftEmpty }}" hint-placeholder-val="{{ true }}">
+                <span style="font-family:'VT323';font-size:16px;color:#b0a08c;">add ingredients below...</span>
+              </sc-if>
+              <sc-for list="{{ draftChips }}" as="dc" hint-placeholder-count="0">
+                <button onClick="{{ dc.onRemove }}" style="display:flex;align-items:center;gap:3px;font-family:'Press Start 2P';font-size:7px;color:#3b2a1f;background:#f3e9dc;border:2px solid #3b2a1f;padding:3px 4px;cursor:pointer;"><span style="width:9px;height:9px;background:{{ dc.color }};border:1px solid #3b2a1f;"></span>{{ dc.num }}.{{ dc.label }} &times;</button>
+              </sc-for>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px;">
+              <sc-for list="{{ draftPalette }}" as="p" hint-placeholder-count="9">
+                <button onClick="{{ p.onAdd }}" style="display:flex;align-items:center;gap:4px;font-family:'Press Start 2P';font-size:7px;color:#3b2a1f;background:#fff;border:2px solid #3b2a1f;padding:5px 3px;cursor:pointer;"><span style="width:12px;height:12px;background:{{ p.color }};border:2px solid #3b2a1f;flex-shrink:0;"></span>{{ p.label }}</button>
+              </sc-for>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-family:'Press Start 2P';font-size:7px;color:#8a6a4f;">PRICE</span>
+              <button onClick="{{ onPriceDec }}" style="font-family:'Press Start 2P';font-size:10px;width:30px;height:30px;background:#c8a97e;border:3px solid #3b2a1f;color:#3b2a1f;cursor:pointer;padding:0;">-</button>
+              <span style="font-family:'Press Start 2P';font-size:12px;color:#3b2a1f;min-width:44px;text-align:center;">${{ draftPrice }}</span>
+              <button onClick="{{ onPriceInc }}" style="font-family:'Press Start 2P';font-size:10px;width:30px;height:30px;background:#c8a97e;border:3px solid #3b2a1f;color:#3b2a1f;cursor:pointer;padding:0;">+</button>
+            </div>
+
+            <div style="display:flex;gap:8px;">
+              <button onClick="{{ onDraftClear }}" style="flex:1;font-family:'Press Start 2P';font-size:8px;background:#e0a43b;color:#3b2a1f;border:3px solid #3b2a1f;padding:10px;cursor:pointer;">CLEAR</button>
+              <button onClick="{{ onDraftSave }}" style="flex:2;font-family:'Press Start 2P';font-size:8px;background:{{ saveBtnBg }};color:{{ saveBtnFg }};border:3px solid #3b2a1f;padding:10px;cursor:pointer;">ADD TO MENU</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+
+    <div style="display:flex;border-top:4px solid #3b2a1f;background:#6f4e37;">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+        <button onClick="{{ n.onClick }}" style="flex:1;font-family:'Press Start 2P';font-size:8px;padding:12px 2px;background:{{ n.bg }};color:{{ n.fg }};border:none;border-right:3px solid #3b2a1f;cursor:pointer;position:relative;">{{ n.label }}<sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:4px;right:6px;min-width:14px;height:14px;background:#bc4b51;color:#fff;border:2px solid #3b2a1f;font-size:7px;line-height:12px;">{{ n.badgeCount }}</span></sc-if></button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ mg.active }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(42,29,20,.92);display:flex;flex-direction:column;padding:14px;z-index:20;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div style="font-family:'Press Start 2P';font-size:9px;color:#f3e9dc;flex:1;">{{ mg.custName }}: {{ mg.recipeName }}</div>
+          <button onClick="{{ mg.doServe }}" style="font-family:'Press Start 2P';font-size:8px;background:#6a994e;border:3px solid #3b2a1f;color:#fff;padding:6px 8px;cursor:pointer;">SERVE</button>
+          <button onClick="{{ clearDrink }}" style="font-family:'Press Start 2P';font-size:8px;background:#e0a43b;border:3px solid #3b2a1f;color:#3b2a1f;padding:6px 8px;cursor:pointer;">CLEAR</button>
+          <button onClick="{{ cancelOrder }}" style="font-family:'Press Start 2P';font-size:8px;background:#c8a97e;border:3px solid #3b2a1f;color:#3b2a1f;padding:6px 8px;cursor:pointer;">X</button>
+        </div>
+
+        <div style="width:100%;height:12px;background:#3b2a1f;border:2px solid #000;margin-bottom:10px;">
+          <div style="height:100%;width:{{ mg.timePct }}%;background:{{ mg.timeColor }};transition:width .3s linear;"></div>
+        </div>
+
+        <div style="background:#fbf4e9;border:3px solid #3b2a1f;padding:8px;margin-bottom:10px;">
+          <sc-if value="{{ mg.recommend }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;"><span style="font-family:'Press Start 2P';font-size:8px;background:#e0577b;color:#fff;border:2px solid #3b2a1f;padding:3px 4px;">RECOMMEND</span></div>
+            <div style="font-family:'VT323';font-size:18px;color:#3b2a1f;line-height:1.05;">{{ mg.recHint }}</div>
+          </sc-if>
+          <sc-if value="{{ mg.showRecipe }}" hint-placeholder-val="{{ true }}">
+          <div style="font-family:'Press Start 2P';font-size:8px;color:#8a6a4f;margin-bottom:6px;">RECIPE (in order)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <sc-for list="{{ mg.targetList }}" as="t" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:5px;padding:4px 7px;background:{{ t.slotBg }};border:3px solid #3b2a1f;">
+                <span style="font-family:'Press Start 2P';font-size:8px;color:#8a6a4f;">{{ t.num }}</span>
+                <div style="width:16px;height:16px;background:{{ t.color }};border:2px solid #3b2a1f;"></div>
+                <span style="font-family:'VT323';font-size:16px;color:#3b2a1f;">{{ t.label }}</span>
+                <sc-if value="{{ t.done }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Press Start 2P';font-size:8px;color:#6a994e;">OK</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+          <div ref="{{ cupRef }}" style="position:relative;width:120px;height:150px;background:#efe3cf;border:5px solid #3b2a1f;border-radius:0 0 16px 16px;display:flex;flex-direction:column-reverse;padding:6px;box-shadow:6px 6px 0 rgba(0,0,0,.3);">
+            <div style="position:absolute;right:-30px;top:24px;width:26px;height:50px;border:5px solid #3b2a1f;border-left:none;border-radius:0 20px 20px 0;"></div>
+            <sc-for list="{{ mg.addedList }}" as="a" hint-placeholder-count="0">
+              <div style="width:100%;height:24px;background:{{ a.color }};border:2px solid #3b2a1f;margin-top:3px;display:flex;align-items:center;justify-content:center;animation:pop .2s ease-out;">
+                <span style="font-family:'Press Start 2P';font-size:7px;color:{{ a.textColor }};">{{ a.label }}</span>
+              </div>
+            </sc-for>
+            <div style="position:absolute;top:-4px;left:0;right:0;font-family:'Press Start 2P';font-size:7px;color:#8a6a4f;text-align:center;">DROP HERE</div>
+          </div>
+        </div>
+
+        <div style="font-family:'VT323';font-size:16px;color:#c8a97e;text-align:center;margin-bottom:6px;">drag ingredients into the cup (or tap them)</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+          <sc-for list="{{ mg.palette }}" as="p" hint-placeholder-count="8">
+            <div onPointerDown="{{ p.onDown }}" style="touch-action:none;user-select:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;background:{{ p.bg }};border:3px solid #3b2a1f;box-shadow:3px 3px 0 #3b2a1f;cursor:grab;opacity:{{ p.opacity }};">
+              <div style="width:22px;height:22px;background:{{ p.color }};border:2px solid #3b2a1f;"></div>
+              <span style="font-family:'Press Start 2P';font-size:7px;color:#3b2a1f;">{{ p.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ toast.show }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:30;font-family:'Press Start 2P';font-size:12px;color:#f2c14e;background:#3b2a1f;border:3px solid #f2c14e;padding:8px 12px;animation:floatUp 1.2s ease-out forwards;pointer-events:none;">{{ toast.text }}</div>
+    </sc-if>
+
+    <sc-if value="{{ showIntro }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(42,29,20,.94);display:flex;align-items:center;justify-content:center;padding:20px;z-index:40;">
+        <div style="background:#f3e9dc;border:4px solid #3b2a1f;box-shadow:8px 8px 0 rgba(0,0,0,.4);padding:18px;max-width:340px;">
+          <div style="font-family:'Press Start 2P';font-size:14px;color:#6f4e37;line-height:1.6;margin-bottom:12px;">BREW &amp; BLOOM CAFE</div>
+          <div style="font-family:'VT323';font-size:19px;color:#3b2a1f;line-height:1.15;">
+            Welcome, barista! Your shop runs 6:00 AM to 3:00 PM each day.<br><br>
+            1. Tap OPEN in the top bar to unlock the doors and start the day.<br>
+            2. Tap a waiting guest in the QUEUE to make their order.<br>
+            3. Drag ingredients into the cup in the EXACT recipe order.<br>
+            4. Correct + fast = bigger tips. Wrong mix? Hit CLEAR and retry.<br>
+            5. Design your own drinks in the MENU tab, restock, and decorate.<br><br>
+            At 3:00 PM the day ends and the shop closes until you re-open. No fail state - just a cozy little shop!
+          </div>
+          <button onClick="{{ startGame }}" style="width:100%;margin-top:14px;font-family:'Press Start 2P';font-size:12px;background:#6a994e;color:#fff;border:3px solid #3b2a1f;box-shadow:4px 4px 0 #3b2a1f;padding:12px;cursor:pointer;">OPEN THE SHOP</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ dayEndPopup }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(42,29,20,.94);display:flex;align-items:center;justify-content:center;padding:20px;z-index:42;">
+        <div style="background:#f3e9dc;border:4px solid #3b2a1f;box-shadow:8px 8px 0 rgba(0,0,0,.4);padding:18px;max-width:330px;text-align:center;">
+          <div style="font-family:'Press Start 2P';font-size:12px;color:#6f4e37;line-height:1.6;margin-bottom:12px;">3:00 PM<br>CLOSING TIME</div>
+          <div style="font-family:'VT323';font-size:19px;color:#3b2a1f;line-height:1.2;">
+            Day {{ endedDay }} is done - you served {{ endedServed }} guest(s) today!<br><br>
+            The shop is closed for the night. Restock, decorate, and grab an upgrade, then tap OPEN when you are ready to start Day {{ nextDay }}.
+          </div>
+          <button onClick="{{ closeDayPopup }}" style="width:100%;margin-top:14px;font-family:'Press Start 2P';font-size:11px;background:#6a994e;color:#fff;border:3px solid #3b2a1f;box-shadow:4px 4px 0 #3b2a1f;padding:12px;cursor:pointer;">GOOD DAY!</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ gh.active }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;left:{{ gh.x }}px;top:{{ gh.y }}px;transform:translate(-50%,-50%);z-index:50;pointer-events:none;width:34px;height:34px;background:{{ gh.color }};border:3px solid #3b2a1f;box-shadow:3px 3px 0 rgba(0,0,0,.4);"></div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:820},&quot;difficulty&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Cozy&quot;,&quot;Normal&quot;,&quot;Busy&quot;],&quot;default&quot;:&quot;Cozy&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Gameplay&quot;},&quot;soundEnabled&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Gameplay&quot;},&quot;startMoney&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:50,&quot;min&quot;:20,&quot;max&quot;:300,&quot;step&quot;:10,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Gameplay&quot;}}">
+class Component extends DCLogic {
+  RECIPES = {
+    espresso:{name:'Espresso', short:'ESPRESSO', price:4, steps:['beans','shot']},
+    americano:{name:'Americano', short:'AMERICANO', price:4, steps:['beans','shot','ice']},
+    latte:{name:'Latte', short:'LATTE', price:6, steps:['beans','shot','milk','foam']},
+    cappuccino:{name:'Cappuccino', short:'CAPPUCC.', price:6, steps:['beans','shot','foam','milk']},
+    mocha:{name:'Mocha', short:'MOCHA', price:7, steps:['beans','shot','chocolate','milk','whip']},
+  };
+  ING = {
+    beans:{label:'Grind', color:'#6f4e37', supply:'beans'},
+    shot:{label:'Shot', color:'#2a1a12'},
+    milk:{label:'Milk', color:'#efe3cf', supply:'milk'},
+    foam:{label:'Foam', color:'#ffffff', supply:'milk'},
+    chocolate:{label:'Cocoa', color:'#4a2c1a', supply:'chocolate'},
+    syrup:{label:'Syrup', color:'#c98a3a', supply:'syrup'},
+    ice:{label:'Ice', color:'#bcdce8'},
+    whip:{label:'Whip', color:'#fff7ef'},
+    oatmilk:{label:'Oat', color:'#e6d2a8', supply:'oatmilk'},
+  };
+  PALETTE = ['beans','shot','milk','oatmilk','foam','chocolate','syrup','ice','whip'];
+  MODS = { double:{label:'Double Shot', short:'2X'}, oat:{label:'Oat Milk', short:'OAT'} };
+  SUPPLIES = {
+    beans:{name:'Beans', pack:6, cost:8, color:'#6f4e37'},
+    milk:{name:'Milk', pack:6, cost:6, color:'#efe3cf'},
+    oatmilk:{name:'Oat Milk', pack:6, cost:7, color:'#e6d2a8'},
+    cups:{name:'Cups', pack:10, cost:4, color:'#e0d3c0'},
+    syrup:{name:'Syrup', pack:4, cost:6, color:'#c98a3a'},
+    chocolate:{name:'Cocoa', pack:4, cost:6, color:'#4a2c1a'},
+  };
+  FURNITURE = [
+    {id:'table', name:'Table', cost:20, seats:1, rep:2, color:'#9c6b43', tag:'TBL', spot:'table'},
+    {id:'chair', name:'Armchair', cost:18, seats:1, rep:2, color:'#bc4b51', tag:'CHR', spot:'chair'},
+    {id:'plant', name:'Plant', cost:12, rep:3, color:'#6a994e', tag:'PLT', spot:'plant'},
+    {id:'shelf', name:'Bookshelf', cost:32, rep:4, patience:1, color:'#8a5a2b', tag:'BKS', spot:'shelf'},
+    {id:'sign', name:'Neon Sign', cost:45, rep:3, spawn:true, color:'#e0577b', tag:'SGN', spot:'sign'},
+    {id:'rug', name:'Cozy Rug', cost:16, rep:2, color:'#3d5a80', tag:'RUG', spot:'rug'},
+  ];
+  SPOTS = [
+    {id:'i_shelf', type:'shelf', view:'inside', left:'36%', top:'4%', w:92, h:44, label:'shelf'},
+    {id:'i_plant1', type:'plant', view:'inside', left:'3%', top:'44%', w:30, h:64, label:'plant'},
+    {id:'i_plant2', type:'plant', view:'inside', left:'89%', top:'44%', w:30, h:64, label:'plant'},
+    {id:'i_rug', type:'rug', view:'inside', left:'33%', top:'66%', w:120, h:24, label:'rug'},
+    {id:'i_table1', type:'table', view:'inside', left:'17%', top:'52%', w:48, h:52, label:'table'},
+    {id:'i_chair1', type:'chair', view:'inside', left:'10%', top:'62%', w:30, h:42, label:'chair'},
+    {id:'i_table2', type:'table', view:'inside', left:'63%', top:'52%', w:48, h:52, label:'table'},
+    {id:'i_chair2', type:'chair', view:'inside', left:'74%', top:'62%', w:30, h:42, label:'chair'},
+    {id:'o_sign', type:'sign', view:'outside', left:'5%', top:'80%', w:60, h:16, label:'sign'},
+    {id:'o_plant1', type:'plant', view:'outside', left:'1%', top:'56%', w:28, h:84, label:'plant'},
+    {id:'o_plant2', type:'plant', view:'outside', left:'90%', top:'56%', w:28, h:84, label:'plant'},
+    {id:'o_table1', type:'table', view:'outside', left:'7%', top:'62%', w:80, h:74, label:'table'},
+    {id:'o_chair1', type:'chair', view:'outside', left:'1%', top:'70%', w:28, h:58, label:'chair'},
+    {id:'o_table2', type:'table', view:'outside', left:'63%', top:'62%', w:80, h:74, label:'table'},
+    {id:'o_chair2', type:'chair', view:'outside', left:'90%', top:'70%', w:28, h:58, label:'chair'},
+  ];
+  UPGRADES = [
+    {id:'grinder', name:'Fast Grinder', cost:60, desc:'More time to make each drink'},
+    {id:'roaster', name:'Big Roaster', cost:90, desc:'+2 guest capacity'},
+    {id:'premium', name:'Premium Beans', cost:120, desc:'+40% on every drink price'},
+    {id:'foamer', name:'Auto Foamer', cost:140, desc:'Foam steps count automatically'},
+    {id:'loyalty', name:'Loyalty Cards', cost:170, desc:'Guests arrive more often'},
+  ];
+  NAMES = ['Rosa','Milo','Ivy','Otis','Pearl','Hugo','Nell','Cyrus','Wren','Bea','Kip','Dot','Sol','Fern','Ravi','June'];
+  SKINS = ['#e8b98b','#c98a5a','#8a5a3a','#f0c9a0','#a06a44'];
+  COLORS = ['#bc4b51','#6a994e','#3d5a80','#c98a3a','#8a5a2b','#e0577b','#4a7c8a','#9c6b43'];
+
+  constructor(props){ super(props); this.cupRef = React.createRef(); this.state = this.blankState(); this._nid = 1; }
+
+  blankState(){
+    return { loaded:false, money:(this.props.startMoney ?? 50), day:1, served:0, dayServed:0, reputation:0,
+      inventory:{beans:12, milk:12, oatmilk:8, cups:18, syrup:6, chocolate:6},
+      placements:{}, shopView:'inside', upgrades:[], customers:[],
+      storeName:'BREW & BLOOM', customDrinks:[], draft:{name:'', price:5, steps:[]},
+      tab:'serve', mg:{active:false}, gh:{active:false}, toast:{show:false},
+      spawnTimer:6, muted:(this.props.soundEnabled===false), showIntro:false, difficulty:(this.props.difficulty||'Cozy'),
+      open:false, gameMin:360, dayEndPopup:false, lastDayServed:0 };
+  }
+
+  allRecipes(){ const o={...this.RECIPES}; (this.state.customDrinks||[]).forEach(d=>{ const sn=(d.name||'CUSTOM').toUpperCase().replace(/[^A-Z0-9 ]/g,'').trim().slice(0,9)||'CUSTOM'; o['c'+d.id]={name:d.name, short:sn, price:d.price, steps:d.steps, custom:true, cid:d.id}; }); return o; }
+  recipe(k){ return this.allRecipes()[k]; }
+
+  spriteFor(type, f){
+    const wood='#9c6b43', woodD='#7a5030', bd='2px solid #3b2a1f';
+    const c=(f&&f.color)||'#9c6b43';
+    switch(type){
+      case 'table': return [
+        {l:'2%',t:'24%',w:'96%',h:'15%',bg:wood,bd,r:'0'},
+        {l:'20%',t:'38%',w:'60%',h:'8%',bg:woodD,bd,r:'0'},
+        {l:'10%',t:'44%',w:'9%',h:'56%',bg:woodD,bd,r:'0'},
+        {l:'81%',t:'44%',w:'9%',h:'56%',bg:woodD,bd,r:'0'},
+      ];
+      case 'chair': return [
+        {l:'16%',t:'4%',w:'16%',h:'62%',bg:c,bd,r:'0'},
+        {l:'16%',t:'50%',w:'64%',h:'16%',bg:c,bd,r:'0'},
+        {l:'20%',t:'64%',w:'10%',h:'36%',bg:woodD,bd,r:'0'},
+        {l:'66%',t:'64%',w:'10%',h:'36%',bg:woodD,bd,r:'0'},
+      ];
+      case 'plant': return [
+        {l:'27%',t:'55%',w:'46%',h:'45%',bg:'#b5794a',bd,r:'0 0 24% 24%'},
+        {l:'22%',t:'49%',w:'56%',h:'10%',bg:'#c98a5a',bd,r:'0'},
+        {l:'10%',t:'2%',w:'80%',h:'56%',bg:c,bd,r:'50%'},
+        {l:'33%',t:'20%',w:'34%',h:'40%',bg:'#5c8a44',bd:'none',r:'50%'},
+      ];
+      case 'shelf': return [
+        {l:'6%',t:'0%',w:'88%',h:'100%',bg:'#8a5a2b',bd,r:'0'},
+        {l:'12%',t:'8%',w:'18%',h:'26%',bg:'#bc4b51',bd:'1px solid #3b2a1f',r:'0'},
+        {l:'32%',t:'8%',w:'14%',h:'26%',bg:'#6a994e',bd:'1px solid #3b2a1f',r:'0'},
+        {l:'48%',t:'8%',w:'18%',h:'26%',bg:'#3d5a80',bd:'1px solid #3b2a1f',r:'0'},
+        {l:'12%',t:'38%',w:'76%',h:'5%',bg:'#6f4522',bd:'none',r:'0'},
+        {l:'16%',t:'48%',w:'16%',h:'26%',bg:'#e0a43b',bd:'1px solid #3b2a1f',r:'0'},
+        {l:'40%',t:'48%',w:'18%',h:'26%',bg:'#c98a3a',bd:'1px solid #3b2a1f',r:'0'},
+        {l:'12%',t:'80%',w:'76%',h:'5%',bg:'#6f4522',bd:'none',r:'0'},
+      ];
+      case 'sign': return [
+        {l:'2%',t:'16%',w:'96%',h:'68%',bg:c,bd,r:'0'},
+        {l:'14%',t:'36%',w:'72%',h:'28%',bg:'#f3e9dc',bd:'none',r:'0'},
+      ];
+      case 'rug': return [
+        {l:'0%',t:'40%',w:'100%',h:'44%',bg:c,bd,r:'0'},
+        {l:'8%',t:'50%',w:'84%',h:'7%',bg:'#f3e9dc',bd:'none',r:'0'},
+        {l:'8%',t:'66%',w:'84%',h:'7%',bg:'#f3e9dc',bd:'none',r:'0'},
+      ];
+      default: return [{l:'10%',t:'10%',w:'80%',h:'80%',bg:c,bd,r:'0'}];
+    }
+  }
+
+  diffFactor(){ const d=this.state.difficulty; if(d==='Busy') return {pat:0.7, spawn:0.7}; if(d==='Normal') return {pat:1, spawn:1}; return {pat:1.4, spawn:1.35}; }
+  hasUpg(id){ return this.state.upgrades.indexOf(id)>=0; }
+  seating(){ let s=3; Object.values(this.state.placements).forEach(id=>{ const f=this.FURNITURE.find(x=>x.id===id); if(f&&f.seats) s+=f.seats; }); if(this.hasUpg('roaster')) s+=2; return s; }
+  priceMult(){ return this.hasUpg('premium')?1.4:1; }
+  effectiveSteps(rk,mods){ let steps=[...this.recipe(rk).steps]; if(mods&&mods.indexOf('oat')>=0) steps=steps.map(x=>x==='milk'?'oatmilk':x); if(mods&&mods.indexOf('double')>=0){ const i=steps.lastIndexOf('shot'); if(i>=0) steps.splice(i+1,0,'shot'); } return steps; }
+  seqMatch(a,t){ if(a.length!==t.length) return false; for(let i=0;i<t.length;i++){ if(this.hasUpg('foamer')&&(t[i]==='foam'||t[i]==='oatfoam')) continue; if(a[i]!==t[i]) return false; } return true; }
+  maxPatience(){ let p=44; Object.values(this.state.placements).forEach(id=>{ const f=this.FURNITURE.find(x=>x.id===id); if(f&&f.patience) p+=f.patience*10; }); p+=Math.min(24, Math.floor(this.state.reputation/4)); return Math.round(p*this.diffFactor().pat); }
+  spawnInterval(){ let i=18; i-=Math.floor(this.state.reputation/10); if(Object.values(this.state.placements).indexOf('sign')>=0) i-=3; if(this.hasUpg('loyalty')) i-=4; i=Math.round(i*this.diffFactor().spawn); return Math.max(6,i); }
+
+  componentDidMount(){
+    let s=null; try{ const raw=localStorage.getItem('coffeeTycoon_v1'); if(raw) s=JSON.parse(raw); }catch(e){}
+    if(s){ if(s.slots && !s.placements){ const pl={}; s.slots.forEach(id=>{ if(id){ const f=this.FURNITURE.find(x=>x.id===id); if(f){ const sp=this.SPOTS.find(x=>x.type===f.spot && !pl[x.id]); if(sp) pl[sp.id]=id; } } }); s.placements=pl; delete s.slots; } this.setState({...this.blankState(), ...s, loaded:true, draft:{name:'', price:5, steps:[]}, mg:{active:false}, gh:{active:false}, toast:{show:false}, showIntro:false}); }
+    else { this.setState({loaded:true, showIntro:true}); }
+    this._tick=setInterval(()=>this.tick(),500);
+    this._onMove=e=>this.handleMove(e); this._onUp=e=>this.handleUp(e);
+    window.addEventListener('pointermove',this._onMove,{passive:false});
+    window.addEventListener('pointerup',this._onUp);
+  }
+  componentWillUnmount(){ clearInterval(this._tick); window.removeEventListener('pointermove',this._onMove); window.removeEventListener('pointerup',this._onUp); }
+
+  save(){ try{ const s=this.state; localStorage.setItem('coffeeTycoon_v1', JSON.stringify({money:s.money,day:s.day,served:s.served,dayServed:s.dayServed,reputation:s.reputation,inventory:s.inventory,placements:s.placements,shopView:s.shopView,upgrades:s.upgrades,difficulty:s.difficulty,muted:s.muted,storeName:s.storeName,customDrinks:s.customDrinks})); }catch(e){} }
+
+  newCustomer(){ const keys=Object.keys(this.allRecipes()); const mp=this.maxPatience(); let recipe, mods=[]; if(Math.random()<0.16){ recipe='recommend'; } else { recipe=keys[Math.floor(Math.random()*keys.length)]; if(Math.random()<0.28) mods.push('double'); if(this.recipe(recipe).steps.indexOf('milk')>=0 && Math.random()<0.32) mods.push('oat'); } return { id:this._nid++, name:this.NAMES[Math.floor(Math.random()*this.NAMES.length)], recipe, mods, patience:mp, maxPatience:mp, skin:this.SKINS[Math.floor(Math.random()*this.SKINS.length)], color:this.COLORS[Math.floor(Math.random()*this.COLORS.length)] }; }
+
+  tick(){
+    if(this.state.showIntro || !this.state.loaded || this.state.dayEndPopup) return;
+    if(!this.state.open) return;
+    let ev={};
+    this.setState(s=>{
+      const gameMin = s.gameMin + 1.5;
+      if(gameMin >= 900){ ev.dayEnd=true; return { gameMin:360, open:false, dayEndPopup:true, customers:[], mg:{active:false}, gh:{active:false}, day:s.day+1, dayServed:0, lastDayServed:s.dayServed }; }
+      let customers = s.customers.map(c=> c.id===(s.mg.active?s.mg.custId:-1)? c : {...c, patience:c.patience-1}).filter(c=>{ if(c.patience<=0){ ev.left=true; return false;} return true; });
+      let spawnTimer=s.spawnTimer-1;
+      const waiting=customers.length;
+      if(spawnTimer<=0){ if(waiting < this.seating()){ customers=[...customers,this.newCustomer()]; ev.spawn=true; } spawnTimer=this.spawnInterval()+Math.floor(Math.random()*4); }
+      let mg=s.mg;
+      if(mg.active){ const tl=mg.timeLeft-1; if(tl<=0){ ev.timeout=true; mg={...mg,timeLeft:0}; } else mg={...mg,timeLeft:tl}; }
+      return {gameMin, customers, spawnTimer, mg};
+    }, ()=>{
+      if(ev.dayEnd){ this.sfx('serve'); this.save(); return; }
+      if(ev.spawn) this.sfx('customer');
+      if(ev.timeout) this.doServe();
+    });
+    this._sc=(this._sc||0)+1; if(this._sc%8===0) this.save();
+  }
+
+  toast(text){ this.setState({toast:{show:false}}, ()=>{ setTimeout(()=>this.setState({toast:{show:true,text,k:Date.now()}}),20); setTimeout(()=>this.setState({toast:{show:false}}),1250); }); }
+
+  initAudio(){ if(this._ac) return; try{ this._ac=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  beep(freq,dur,type,vol,delay){ if(this.state.muted||!this._ac) return; const ac=this._ac; const t=ac.currentTime+(delay||0); const o=ac.createOscillator(); const g=ac.createGain(); o.type=type||'square'; o.frequency.setValueAtTime(freq,t); o.connect(g); g.connect(ac.destination); g.gain.setValueAtTime(vol||0.05,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); o.start(t); o.stop(t+dur); }
+  sfx(kind){ this.initAudio(); if(kind==='add'){ this.beep(520,0.08,'square',0.05); } else if(kind==='coin'){ this.beep(660,0.08,'square',0.06); this.beep(990,0.12,'square',0.06,0.08); } else if(kind==='serve'){ [523,659,784].forEach((f,i)=>this.beep(f,0.12,'triangle',0.06,i*0.07)); } else if(kind==='error'){ this.beep(150,0.14,'sawtooth',0.05); } else if(kind==='customer'){ this.beep(392,0.09,'triangle',0.045); this.beep(523,0.09,'triangle',0.045,0.07); } else if(kind==='buy'){ this.beep(300,0.06,'square',0.05); this.beep(450,0.09,'square',0.05,0.05); } }
+
+  startOrder(id){ this.initAudio(); const c=this.state.customers.find(x=>x.id===id); if(!c) return; if(this.state.inventory.cups<=0){ this.toast('OUT OF CUPS'); this.sfx('error'); this.setState({tab:'supplies'}); return; } const mods=c.mods||[]; const isRec=c.recipe==='recommend'; const steps=isRec?[]:this.effectiveSteps(c.recipe,mods); const len=isRec?4:steps.length; const secs=len*3+(this.hasUpg('grinder')?5:0)+(isRec?4:0); const ticks=secs*2; this.setState({mg:{active:true, custId:id, recipe:c.recipe, mods, steps, recommend:isRec, added:[], timeLeft:ticks, timeMax:ticks}}); }
+  cancelOrder(){ this.setState({mg:{active:false}, gh:{active:false}}); }
+  clearDrink(){ if(!this.state.mg.active) return; this.setState(s=>({mg:{...s.mg, added:[]}})); this.sfx('error'); }
+  toggleOpen(){ this.initAudio(); if(this.state.dayEndPopup) return; this.setState(s=>({open:!s.open}), ()=>this.save()); this.sfx('buy'); }
+  closeDayPopup(){ this.setState({dayEndPopup:false}); }
+
+  addIngredient(ing){ const s=this.state, mg=s.mg; if(!mg.active) return; const limit=mg.recommend?6:mg.steps.length; if(mg.added.length>=limit) return; const sup=this.ING[ing].supply; if(sup && s.inventory[sup]<=0){ this.sfx('error'); this.toast('NO '+this.SUPPLIES[sup].name.toUpperCase()); return; } const inv={...s.inventory}; if(sup) inv[sup]=inv[sup]-1; const added=[...mg.added,ing]; this.sfx('add'); this.setState({inventory:inv, mg:{...mg,added}}, ()=>{ if(!mg.recommend && added.length>=mg.steps.length) setTimeout(()=>this.doServe(),380); }); }
+
+  doServe(){ const s=this.state, mg=s.mg; if(!mg.active) return; const added=mg.added; const inv={...s.inventory}; inv.cups=Math.max(0,inv.cups-1); const mods=mg.mods||[];
+    let matchedKey=mg.recipe, ok=false;
+    if(mg.recommend){ if(added.length>0){ const ar=this.allRecipes(); for(const k of Object.keys(ar)){ if(this.seqMatch(added,ar[k].steps)){ matchedKey=k; ok=true; break; } } } }
+    else { ok=this.seqMatch(added, mg.steps); }
+    if(!ok){ this.setState({inventory:inv, mg:{active:false}, gh:{active:false}}, ()=>this.save()); this.sfx('error'); this.toast(mg.recommend?'HMM, NOT A DRINK':'OOPS! WRONG DRINK'); return; }
+    const speed = mg.timeMax? Math.max(0,mg.timeLeft/mg.timeMax):0; const base=this.recipe(matchedKey).price*this.priceMult(); let surcharge=0; if(mods.indexOf('double')>=0) surcharge+=2; if(mods.indexOf('oat')>=0) surcharge+=1; const recBonus=mg.recommend?3:0; const tip=Math.round(base*0.5*speed); const pay=Math.round(base)+surcharge+recBonus+tip; const rep=mg.recommend?3:2;
+    this.setState({money:s.money+pay, inventory:inv, reputation:s.reputation+rep, customers:s.customers.filter(c=>c.id!==mg.custId), served:s.served+1, dayServed:s.dayServed+1, mg:{active:false}, gh:{active:false}}, ()=>this.save());
+    this.sfx('serve'); this.toast(mg.recommend?('GREAT PICK! +$'+pay):(tip>0? 'NICE! +$'+pay+' (tip $'+tip+')' : 'SERVED +$'+pay)); }
+
+  buySupply(key){ this.initAudio(); const sp=this.SUPPLIES[key]; if(this.state.money<sp.cost){ this.sfx('error'); this.toast('NOT ENOUGH CASH'); return; } this.setState(s=>({money:s.money-sp.cost, inventory:{...s.inventory,[key]:s.inventory[key]+sp.pack}}), ()=>this.save()); this.sfx('buy'); }
+  buyFurniture(f){ this.initAudio(); if(this.state.money<f.cost){ this.sfx('error'); this.toast('NOT ENOUGH CASH'); return; } const order=[this.state.shopView, this.state.shopView==='inside'?'outside':'inside']; let spot=null; for(const v of order){ spot=this.SPOTS.find(sp=>sp.view===v && sp.type===f.spot && !this.state.placements[sp.id]); if(spot) break; } if(!spot){ this.toast('NO '+f.spot.toUpperCase()+' SPOT'); this.sfx('error'); return; } const sid=spot.id, sview=spot.view; this.setState(s=>({money:s.money-f.cost, placements:{...s.placements,[sid]:f.id}, reputation:s.reputation+(f.rep||0), tab:'shop', shopView:sview}), ()=>this.save()); this.sfx('buy'); this.toast(f.name.toUpperCase()+' PLACED'); }
+  removePlacement(sid){ const id=this.state.placements[sid]; if(!id) return; const f=this.FURNITURE.find(x=>x.id===id); const refund=Math.round(f.cost/2); this.setState(s=>{ const placements={...s.placements}; delete placements[sid]; return {placements, money:s.money+refund}; }, ()=>this.save()); this.sfx('coin'); this.toast('+$'+refund+' REFUND'); }
+  toggleShopView(){ this.sfx('buy'); this.setState(s=>({shopView:s.shopView==='inside'?'outside':'inside'})); }
+  buyUpgrade(u){ this.initAudio(); if(this.hasUpg(u.id)) return; if(this.state.money<u.cost){ this.sfx('error'); this.toast('NOT ENOUGH CASH'); return; } this.setState(s=>({money:s.money-u.cost, upgrades:[...s.upgrades,u.id]}), ()=>this.save()); this.sfx('buy'); this.toast(u.name.toUpperCase()+'!'); }
+
+  setStoreName(v){ this.setState({storeName:(v||'').toUpperCase().slice(0,20)}, ()=>this.save()); }
+  onDraftName(v){ this.setState(s=>({draft:{...s.draft, name:v.slice(0,18)}})); }
+  draftAddStep(ing){ this.initAudio(); this.setState(s=>{ if(s.draft.steps.length>=6) return {}; return {draft:{...s.draft, steps:[...s.draft.steps, ing]}}; }); this.sfx('add'); }
+  draftRemoveAt(i){ this.setState(s=>({draft:{...s.draft, steps:s.draft.steps.filter((_,x)=>x!==i)}})); }
+  draftPriceStep(delta){ this.setState(s=>{ let p=s.draft.price+delta; if(p<1)p=1; if(p>30)p=30; return {draft:{...s.draft, price:p}}; }); }
+  draftClear(){ this.setState(s=>({draft:{name:'', price:5, steps:[]}})); }
+  saveDraft(){ const d=this.state.draft; if(!d.name.trim()||d.steps.length<1){ this.sfx('error'); this.toast('NAME + RECIPE NEEDED'); return; } const nd={id:Date.now(), name:d.name.trim(), price:d.price, steps:[...d.steps]}; this.setState(s=>({customDrinks:[...(s.customDrinks||[]), nd], draft:{name:'', price:5, steps:[]}}), ()=>this.save()); this.sfx('serve'); this.toast(nd.name.toUpperCase()+' ADDED!'); }
+  deleteCustomDrink(id){ this.setState(s=>({customDrinks:(s.customDrinks||[]).filter(x=>x.id!==id)}), ()=>this.save()); this.sfx('error'); }
+
+  startDrag(ing,e){ this.initAudio(); if(!this.state.mg.active) return; const info=this.ING[ing]; this._drag={ing, moved:false, sx:e.clientX, sy:e.clientY}; this.setState({gh:{active:true, x:e.clientX, y:e.clientY, color:info.color}}); }
+  handleMove(e){ if(!this._drag) return; e.preventDefault(); const dx=e.clientX-this._drag.sx, dy=e.clientY-this._drag.sy; if(Math.hypot(dx,dy)>8) this._drag.moved=true; this.setState(s=>({gh:{...s.gh, x:e.clientX, y:e.clientY}})); }
+  pointInCup(e){ const el=this.cupRef.current; if(!el) return false; const r=el.getBoundingClientRect(); return e.clientX>=r.left-20 && e.clientX<=r.right+30 && e.clientY>=r.top-20 && e.clientY<=r.bottom+20; }
+  handleUp(e){ if(!this._drag) return; const d=this._drag; const over=this.pointInCup(e); this._drag=null; this.setState({gh:{active:false}}); if(over || !d.moved) this.addIngredient(d.ing); }
+
+  toggleMute(){ this.initAudio(); this.setState(s=>({muted:!s.muted}), ()=>this.save()); }
+  reset(){ if(!window.confirm('Start a brand new shop? Your current progress will be erased.')) return; try{ localStorage.removeItem('coffeeTycoon_v1'); }catch(e){} this.setState({...this.blankState(), loaded:true, showIntro:false}); }
+  startGame(){ this.initAudio(); this.setState({showIntro:false}); }
+  setTab(t){ this.setState({tab:t}); }
+
+  renderVals(){
+    const s=this.state;
+    const ar=this.allRecipes();
+    const barColor=p=> p>0.5?'#6a994e':p>0.25?'#e0a43b':'#bc4b51';
+    const waiting=s.customers;
+    const sceneQueue=waiting.slice(0,5).map(c=>{ const pct=Math.max(0,Math.round(c.patience/c.maxPatience*100)); return {name:c.name, drinkShort:c.recipe==='recommend'?'REC?':this.recipe(c.recipe).short, skin:c.skin, color:c.color, patiencePct:pct, barColor:barColor(pct/100), onServe:()=>this.startOrder(c.id)}; });
+    const orderList=waiting.map(c=>{ const pct=Math.max(0,Math.round(c.patience/c.maxPatience*100)); const isRec=c.recipe==='recommend'; const mds=(c.mods||[]).map(m=>this.MODS[m].short); let sur=0; if((c.mods||[]).indexOf('double')>=0)sur+=2; if((c.mods||[]).indexOf('oat')>=0)sur+=1; let color='#e0577b', price='?'; if(!isRec){ const rec=this.recipe(c.recipe); const es=this.effectiveSteps(c.recipe,c.mods); color=this.ING[es[es.length-1]].color; price=Math.round(rec.price*this.priceMult())+sur; } return {name:c.name, drink:isRec?'Recommendation':this.recipe(c.recipe).name, want:isRec?(c.name+' wants a recommendation'):(c.name+' wants this'), mods:mds, color, price, patiencePct:pct, barColor:barColor(pct/100), onServe:()=>this.startOrder(c.id)}; });
+
+    const decorScene=[]; Object.keys(s.placements).forEach(k=>{ const id=s.placements[k]; if(id){ const f=this.FURNITURE.find(x=>x.id===id); if(f) decorScene.push({sprite:this.spriteFor(f.spot,f)}); } });
+
+    const sceneSpots=this.SPOTS.filter(sp=>sp.view===s.shopView).map(sp=>{ const id=s.placements[sp.id]; const f=id?this.FURNITURE.find(x=>x.id===id):null; return { left:sp.left, top:sp.top, w:sp.w+'px', h:sp.h+'px', cursor:f?'pointer':'default', sprite:f?this.spriteFor(sp.type,f):[], showLabel:!f, tag:sp.label, onClick: f?(()=>this.removePlacement(sp.id)):(()=>{}) }; });
+    const sceneCustomers=(s.shopView==='inside' && s.open? s.customers.slice(0,3):[]).map((c,i)=>({ left:(32+i*15)+'%', skin:c.skin, color:c.color }));
+
+    const spotFree=type=>this.SPOTS.some(sp=>sp.type===type && !s.placements[sp.id]);
+    const furnitureList=this.FURNITURE.map(f=>{ const parts=[]; if(f.seats) parts.push('+'+f.seats+' seat'); if(f.rep) parts.push('+'+f.rep+' rep'); if(f.patience) parts.push('patient guests'); if(f.spawn) parts.push('more guests'); const free=spotFree(f.spot); const afford=s.money>=f.cost && free; return {name:f.name, sprite:this.spriteFor(f.spot,f), cost:f.cost, effect:free?(parts.join(', ')+' - fills a '+f.spot+' spot'):('all '+f.spot+' spots full'), btnBg:afford?'#6a994e':'#c8a97e', btnFg:afford?'#fff':'#7a5a40', onBuy:()=>this.buyFurniture(f)}; });
+
+    const supplyList=Object.keys(this.SUPPLIES).map(k=>{ const sp=this.SUPPLIES[k]; const stock=s.inventory[k]; const low=stock<4; const afford=s.money>=sp.cost; return {name:sp.name, color:sp.color, stock, pack:sp.pack, cost:sp.cost, nameColor:low?'#bc4b51':'#3b2a1f', btnBg:afford?'#6a994e':'#c8a97e', btnFg:afford?'#fff':'#7a5a40', onBuy:()=>this.buySupply(k)}; });
+
+    const upgradeList=this.UPGRADES.map(u=>{ const owned=this.hasUpg(u.id); const afford=s.money>=u.cost; return {name:u.name, desc:u.desc, cardBg:owned?'#e6efe0':'#fbf4e9', btnLabel:owned?'OWNED':'$'+u.cost, btnBg:owned?'#6a994e':afford?'#6a994e':'#c8a97e', btnFg:owned?'#fff':afford?'#fff':'#7a5a40', onBuy:()=>this.buyUpgrade(u)}; });
+
+    const menuBoardList=Object.keys(ar).slice(0,3).map(k=>ar[k].short+' '+ar[k].price);
+    const menuList=Object.keys(ar).map(k=>{ const r=ar[k]; const last=r.steps[r.steps.length-1]; const color=this.ING[last]?this.ING[last].color:'#6f4e37'; const chips=r.steps.map(id=>({label:this.ING[id].label, color:this.ING[id].color})); const custom=!!r.custom; return {name:r.name, price:r.price, custom, bg:custom?'#f3ecdf':'#fbf4e9', color, chips, onDelete:custom?(()=>this.deleteCustomDrink(r.cid)):(()=>{})}; });
+
+    const draftChips=(s.draft.steps||[]).map((id,i)=>({num:String(i+1), label:this.ING[id].label, color:this.ING[id].color, onRemove:()=>this.draftRemoveAt(i)}));
+    const draftPalette=this.PALETTE.map(id=>({label:this.ING[id].label, color:this.ING[id].color, onAdd:()=>this.draftAddStep(id)}));
+    const canSave=s.draft.name.trim().length>0 && s.draft.steps.length>=1;
+
+    let lowStock=false; Object.keys(this.SUPPLIES).forEach(k=>{ if(s.inventory[k]<4) lowStock=true; });
+    const reps=Math.min(5,Math.floor(s.reputation/10)); let repStars=''; for(let i=0;i<5;i++) repStars+= i<reps?'*':'-';
+
+    const nav=[{key:'serve',label:'QUEUE'},{key:'shop',label:'SHOP'},{key:'supplies',label:'STOCK'},{key:'menu',label:'MENU'}];
+    const navItems=nav.map(n=>{ const active=s.tab===n.key; const badge=n.key==='serve'&&waiting.length>0; const stockBadge=n.key==='supplies'&&lowStock; return {label:n.label, bg:active?'#c8a97e':'#6f4e37', fg:active?'#3b2a1f':'#e8d6c0', onClick:()=>this.setTab(n.key), badge:badge||stockBadge, badgeCount: badge?String(waiting.length):'!'}; });
+
+    let mgv={active:false};
+    if(s.mg.active){ const cust=s.customers.find(c=>c.id===s.mg.custId); const isRec=s.mg.recommend; const ms=(s.mg.mods||[]).map(m=>this.MODS[m].label); const timePct=Math.max(0,Math.round(s.mg.timeLeft/s.mg.timeMax*100)); const steps=s.mg.steps||[]; const targetList=isRec?[]:steps.map((id,i)=>{ const done=i<s.mg.added.length; return {num:String(i+1), label:this.ING[id].label, color:this.ING[id].color, slotBg:done?'#e6efe0':'#f3e9dc', done}; }); const light=id=>(id==='milk'||id==='foam'||id==='ice'||id==='whip'||id==='oatmilk'); const addedList=s.mg.added.map(id=>{ const info=this.ING[id]; return {label:info.label, color:info.color, textColor:light(id)?'#3b2a1f':'#f3e9dc'}; }); const palette=this.PALETTE.map(id=>{ const info=this.ING[id]; const sup=info.supply; const out=sup && s.inventory[sup]<=0; return {label:info.label, color:info.color, bg:out?'#d9cdbb':'#fbf4e9', opacity:out?'0.45':'1', onDown:(e)=>this.startDrag(id,e)}; }); mgv={active:true, custName:cust?cust.name:'Guest', recipeName:isRec?"Barista's Choice":(this.recipe(s.mg.recipe).name+(ms.length?(' + '+ms.join(' + ')):'')), recommend:isRec, showRecipe:!isRec, recHint:'They trust your taste! Build any complete drink from the menu, then tap SERVE.', timePct, timeColor:timePct>40?'#6a994e':timePct>20?'#e0a43b':'#bc4b51', targetList, addedList, palette, doServe:()=>this.doServe()}; }
+
+    const gm=Math.floor(s.gameMin); let ch=Math.floor(gm/60), cm=gm%60; const cap=ch<12?'AM':'PM'; let c12=ch%12; if(c12===0)c12=12; const clock=c12+':'+(cm<10?'0'+cm:cm)+' '+cap;
+    const closed = !s.open && !s.showIntro && !s.dayEndPopup;
+    return { money:s.money, day:s.day, repStars, lowStock, clock, closed,
+      open:s.open, openLabel: s.open?'OPEN':'CLOSED', openBtnBg: s.open?'#6a994e':'#bc4b51', openDotColor: s.open?'#8fd06f':'#e07a7a',
+      dayEndPopup:s.dayEndPopup, endedDay:s.day-1, endedServed:s.lastDayServed, nextDay:s.day,
+      muteLabel: s.muted?'x':'((',
+      sceneQueue, sceneEmpty: waiting.length===0, decorScene,
+      shopInside:s.shopView==='inside', shopOutside:s.shopView==='outside', shopViewBtnLabel:s.shopView==='inside'?'OUTSIDE':'INSIDE', shopTitle:s.shopView==='inside'?'CAFE INTERIOR':'STOREFRONT', sceneSpots, sceneCustomers, placeHint:'Buy decor below - it drops into a matching empty spot. Tap a placed item to sell it back for half.', signText:s.open?'OPEN':'CLOSED', signBg:s.open?'#6a994e':'#bc4b51', toggleShopView:()=>this.toggleShopView(),
+      storeNameVal:s.storeName, onStoreName:(e)=>this.setStoreName(e.target.value),
+      menuBoardList,
+      isServe:s.tab==='serve', isShop:s.tab==='shop', isSupplies:s.tab==='supplies', isMenu:s.tab==='menu',
+      queueCount:waiting.length, orderList, furnitureList, supplyList, upgradeList, navItems,
+      menuList, draftName:s.draft.name, draftPrice:s.draft.price, draftChips, draftPalette, draftEmpty:s.draft.steps.length===0,
+      onDraftName:(e)=>this.onDraftName(e.target.value), onPriceInc:()=>this.draftPriceStep(1), onPriceDec:()=>this.draftPriceStep(-1), onDraftClear:()=>this.draftClear(), onDraftSave:()=>this.saveDraft(), saveBtnBg:canSave?'#6a994e':'#c8a97e', saveBtnFg:canSave?'#fff':'#7a5a40',
+      mg:mgv, gh:s.gh, cupRef:this.cupRef, toast:s.toast, showIntro:s.showIntro,
+      toggleMute:()=>this.toggleMute(), reset:()=>this.reset(), startGame:()=>this.startGame(), cancelOrder:()=>this.cancelOrder(),
+      closeDayPopup:()=>this.closeDayPopup(), clearDrink:()=>this.clearDrink(), toggleOpen:()=>this.toggleOpen() };
+  }
+}
+</script>
+</body>
+</html>
