@@ -171,18 +171,18 @@
 
       <!-- PORTAFILTER -->
       <sc-if value="{{ portaVisible }}" hint-placeholder-val="{{ true }}">
-        <div data-drag="porta" data-drop="porta" onPointerDown="{{ grab }}" style="position:absolute;left:1%;bottom:2%;width:22%;z-index:7;cursor:grab;touch-action:none;text-align:center">
+        <div data-drag="porta" data-drop="porta" onPointerDown="{{ grab }}" style="position:absolute;left:50%;bottom:2%;transform:translateX(-50%);width:30%;z-index:7;cursor:grab;touch-action:none;text-align:center">
           <div style="{{ portaRing }}"><img src="{{ portaSrc }}" style="width:100%;image-rendering:pixelated;filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))"></div>
           <div style="font-family:'Silkscreen';font-size:8px;color:#fff;text-shadow:1px 1px 0 #000;margin-top:1px">{{ portaLabel }}</div>
         </div>
       </sc-if>
-      <!-- TAMP (between grinder and machine) -->
-      <div data-drag="tamp" onPointerDown="{{ grab }}" style="position:absolute;left:24%;bottom:2%;width:11%;z-index:7;cursor:grab;touch-action:none;text-align:center">
+      <!-- TAMP (counter gap between grinder and machine) -->
+      <div data-drag="tamp" onPointerDown="{{ grab }}" style="position:absolute;left:19%;top:58%;width:9.4%;z-index:6;cursor:grab;touch-action:none;text-align:center">
         <img src="{{ tampSrc }}" style="width:100%;image-rendering:pixelated;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))">
         <div style="font-family:'Silkscreen';font-size:8px;color:#fff;text-shadow:1px 1px 0 #000">TAMP</div>
       </div>
       <!-- TRASH -->
-      <div data-drop="trash" style="position:absolute;left:50%;bottom:2%;transform:translateX(-50%);width:13%;z-index:7;text-align:center">
+      <div data-drop="trash" style="position:absolute;left:22%;bottom:2%;transform:translateX(-50%);width:13%;z-index:7;text-align:center">
         <div style="width:100%;aspect-ratio:1;border-radius:10px;background:#2a1c11;border:2px dashed #5c3617;display:flex;align-items:center;justify-content:center;font-size:22px">🗑️</div>
         <div style="font-family:'Silkscreen';font-size:8px;color:#fff;text-shadow:1px 1px 0 #000;margin-top:2px">TRASH</div>
       </div>
