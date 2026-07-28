@@ -1,0 +1,16 @@
+{
+  "name": "Café Barista",
+  "short_name": "Café Barista",
+  "description": "Pull shots, beat the clock, run the shop.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#160f08",
+  "theme_color": "#160f08",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
