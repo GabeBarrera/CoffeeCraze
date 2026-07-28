@@ -61,28 +61,28 @@
 
     <!-- STAGE: whole scene, contained -->
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(100%,calc(100dvh*1536/2752));aspect-ratio:1536/2752;background:#2a1c11">
-      <img src="{{ backdropSrc }}" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated">
+      <img src="assets/scene/cafe-order-scene.png" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated">
 
       <!-- NPCs behind counter (torso and below cropped away by the counter) -->
       <sc-if value="{{ npc0.exists }}" hint-placeholder-val="{{ false }}">
         <div style="position:absolute;left:23%;bottom:53%;transform:translateX(-50%);width:28%;height:22%;overflow:hidden;z-index:2;animation:npcin .4s ease-out">
-          <img src="{{ npc0.src }}" style="display:block;margin:0 auto;height:209%;image-rendering:pixelated">
+          <div style="{{ npc0.sprite }}"></div>
         </div>
       </sc-if>
       <sc-if value="{{ npc1.exists }}" hint-placeholder-val="{{ false }}">
         <div style="position:absolute;left:51%;bottom:53%;transform:translateX(-50%);width:27%;height:22%;overflow:hidden;z-index:2;animation:npcin .4s ease-out">
-          <img src="{{ npc1.src }}" style="display:block;margin:0 auto;height:200%;image-rendering:pixelated">
+          <div style="{{ npc1.sprite }}"></div>
         </div>
       </sc-if>
 
       <!-- overlay counter (occludes NPC lower bodies) -->
-      <img src="{{ overlaySrc }}" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:3;pointer-events:none">
+      <img src="assets/scene/cafe-order-scene-top.png" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:3;pointer-events:none">
 
       <!-- order tickets -->
       <sc-if value="{{ npc0.exists }}" hint-placeholder-val="{{ false }}">
         <div data-drop="serve" data-order="{{ npc0.id }}" style="position:absolute;left:3%;top:8%;width:37%;z-index:8">
           <div style="{{ ticketStyle }}">
-            <img src="{{ npc0.icon }}" style="width:30px;height:30px;object-fit:contain;image-rendering:pixelated">
+            <div style="{{ npc0.icon }}"></div>
             <div style="flex:1;min-width:0">
               <div style="font-family:'Silkscreen';font-size:8px;color:#3a2a18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ npc0.name }}</div>
               <div style="height:6px;border-radius:3px;background:#c9b48f;overflow:hidden;margin-top:3px"><div style="height:100%;width:{{ npc0.pct }};background:{{ npc0.color }};transition:width .2s linear"></div></div>
@@ -93,7 +93,7 @@
       <sc-if value="{{ npc1.exists }}" hint-placeholder-val="{{ false }}">
         <div data-drop="serve" data-order="{{ npc1.id }}" style="position:absolute;left:42%;top:8%;width:37%;z-index:8">
           <div style="{{ ticketStyle }}">
-            <img src="{{ npc1.icon }}" style="width:30px;height:30px;object-fit:contain;image-rendering:pixelated">
+            <div style="{{ npc1.icon }}"></div>
             <div style="flex:1;min-width:0">
               <div style="font-family:'Silkscreen';font-size:8px;color:#3a2a18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ npc1.name }}</div>
               <div style="height:6px;border-radius:3px;background:#c9b48f;overflow:hidden;margin-top:3px"><div style="height:100%;width:{{ npc1.pct }};background:{{ npc1.color }};transition:width .2s linear"></div></div>
@@ -192,8 +192,8 @@
               <div style="font-family:'Silkscreen';font-size:8px;color:#fff;text-shadow:1px 1px 0 #000">WATER</div>
             </div>
           </sc-if>
-          <sc-if value="{{ machineCup }}" hint-placeholder-val="{{ false }}">
-            <div data-drag="shot" data-drop="serve" onPointerDown="{{ grab }}" style="{{ machineCupStyle }}"></div>
+          <sc-if value="{{ shotHitboxVisible }}" hint-placeholder-val="{{ false }}">
+            <div data-drag="shot" data-drop="serve" onPointerDown="{{ grab }}" onClick="{{ takeShot }}" style="{{ machineCupStyle }}"></div>
           </sc-if>
           <sc-if value="{{ brewing }}" hint-placeholder-val="{{ false }}">
             <div style="position:absolute;left:46%;top:52%;width:3px;height:16%;background:#3a2412;opacity:.85;z-index:2"></div>
@@ -221,9 +221,10 @@
             <button onClick="{{ takeShot }}" style="{{ espressoQueueBtnStyle }}">➜ QUEUE</button>
           </sc-if>
         </div>
-        <sc-if value="{{ brewing }}" hint-placeholder-val="{{ false }}">
-          <div style="width:80%;height:8px;background:#2a1c10;border-radius:4px;margin-top:5px;overflow:hidden">
-            <div style="height:100%;width:{{ brewPct }};background:#6b3f1f"></div>
+        <sc-if value="{{ brewBarVisible }}" hint-placeholder-val="{{ false }}">
+          <div style="width:80%;height:8px;background:#2a1c10;border-radius:4px;margin-top:5px;overflow:hidden;position:relative">
+            <div style="position:absolute;left:{{ hitboxLeft }};width:{{ hitboxWidth }};top:0;bottom:0;background:rgba(232,182,97,.4)"></div>
+            <div style="height:100%;width:{{ brewPct }};background:#6b3f1f;position:relative;z-index:1"></div>
           </div>
         </sc-if>
       </div>
@@ -251,7 +252,7 @@
       </div>
       <!-- DRINK STACK -->
       <sc-for list="{{ drinksView }}" as="d" hint-placeholder-count="0">
-        <div data-drag="drink" data-drop="cocoa,milk,water" data-idx="{{ d.idx }}" onPointerDown="{{ grab }}" style="{{ d.style }}">
+        <div data-drag="drink" data-drop="{{ d.drop }}" data-idx="{{ d.idx }}" onPointerDown="{{ grab }}" style="{{ d.style }}">
           <div style="{{ d.sprite }}"></div>
           <div style="font-family:'Silkscreen';font-size:8px;color:#fff;text-shadow:1px 1px 0 #000">{{ d.label }}</div>
         </div>
@@ -454,7 +455,7 @@
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16% 18%">
           <div style="font-family:'VT323',monospace;font-size:15px;line-height:1.35;color:#2a1c11;text-align:left">
             Dear Splat,<br><br>
-            You must be espresso, because you are so brew-tiful! ;)<br><br>
+            Are you coffee and milk? Because I love you a latte and maybe we can go on a date this week? :D<br><br>
             Love,<br>
             Torbi &lt;3
           </div>
@@ -468,7 +469,7 @@
     <div style="position:absolute;left:50%;top:60px;z-index:90;animation:toastup 1.6s ease-out;font-family:'Silkscreen';font-size:11px;color:#fff;background:{{ toastBg }};border:2px solid #0d0805;border-radius:20px;padding:8px 15px;white-space:nowrap">{{ toastText }}</div>
   </sc-if>
 
-  <img id="dragGhost" style="position:absolute;left:0;top:0;width:74px;z-index:100;pointer-events:none;display:none;image-rendering:pixelated;filter:drop-shadow(0 5px 6px rgba(0,0,0,.6));transform:translate(-9999px,-9999px)">
+  <div id="dragGhost" style="position:absolute;left:0;top:0;width:74px;z-index:100;pointer-events:none;display:none;transform:translate(-9999px,-9999px)"></div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:900}}">
@@ -476,15 +477,8 @@ const IMG='assets/', T='assets/';
 const A={
   gabe:T+'characters/barista_gabe.png', daniella:T+'characters/barista_daniella.png',
   backdrop:IMG+'scene/cafe-order-scene.png', overlay:IMG+'scene/cafe-order-scene-top.png',
-  beans:T+'items/beans.png', cup:T+'items/cup.png', milk:T+'items/milk.png', espresso:T+'items/espresso.png', tamp:T+'items/tamp.png', cocoa:T+'items/cocoa.png',
-  glass:T+'items/smallglass-empty.png', waterglass:T+'items/smallglass-water.png', note:T+'items/note.png',
-  grinder:{empty:T+'items/grinder/grinder.png',prep:T+'items/grinder/grinder-prep.png',grinding:T+'items/grinder/grinder-grinding.png',g3:T+'items/grinder/grinder-grounds-3.png',g2:T+'items/grinder/grinder-grounds-2.png',g1:T+'items/grinder/grinder-grounds-1.png'},
-  porta:{clean:T+'items/portafilter/portafilter.png',prep:T+'items/portafilter/portafilter-prep.png',tamped:T+'items/portafilter/portafilter-tamped.png'},
-  machine:{idle:T+'items/espresso-machine/espresso-machine.png',prep:T+'items/espresso-machine/espresso-machine-prep.png',brewing:T+'items/espresso-machine/espresso-machine-brewing.png',shot:T+'items/espresso-machine/espresso-machine-shot.png',empty:T+'items/espresso-machine/espresso-machine-empty.png',cup:T+'items/espresso-machine/espresso-machine-cup.png'},
-  drink:{espresso:T+'items/drinks/espresso-shot.png',americano:T+'items/drinks/americano.png',latte:T+'items/drinks/latte.png',mocha:T+'items/drinks/mocha.png',cortado:T+'items/drinks/cortado.png'},
-  sprites:{grinder:T+'sprites/grinder-sheet.png',machine:T+'sprites/machine-sheet.png',porta:T+'sprites/portafilter-sheet.png',items:T+'sprites/items-sheet.png',drinks:T+'sprites/drinks-sheet.png'}
+  sprites:{grinder:T+'sprites/grinder-sheet.png',machine:T+'sprites/machine-sheet.png',porta:T+'sprites/portafilter-sheet.png',items:T+'sprites/items-sheet.png',drinks:T+'sprites/drinks-sheet.png',npc:T+'sprites/npc-sheet.png'}
 };
-A.drink.water=A.waterglass;
 const GRINDER_FRAMES={empty:0,prep:1,grinding:2,g3:3,g2:4,g1:5};
 const MACHINE_FRAMES={idle:0,prep:1,brewing:2,shot:3,empty:4,cup:5};
 const PORTA_FRAMES={clean:0,prep:1,tamped:2};
@@ -509,6 +503,12 @@ function spriteBgN(sheet,url,key,extra){
   const sizeX=sheet.totalW/f.w*100, sizeY=sheet.totalH/f.h*100;
   return `background-image:url('${url}');background-repeat:no-repeat;background-size:${sizeX}% ${sizeY}%;background-position:${posX}% 0%;width:100%;aspect-ratio:${f.w}/${f.h};image-rendering:pixelated;${extra||''}`;
 }
+const NPC_COUNT=8, NPC_RATIO='625/1864';
+function npcSprite(idx,extra){ return spriteBg(A.sprites.npc,NPC_COUNT,Number(idx)||0,NPC_RATIO,extra); }
+function itemSprite(key,extra){ return spriteBgN(ITEMS_SHEET,A.sprites.items,key,extra); }
+function drinkSprite(key,extra){ return spriteBgN(DRINKS_SHEET,A.sprites.drinks,key,extra); }
+function orderIcon(drink,extra){ return drink==='water'?itemSprite('glassWater',extra):drinkSprite(drink,extra); }
+const HITBOX_START=0.42, HITBOX_END=0.58, HITBOX_MID=0.5;
 const RECIPES=[
   {name:'ESPRESSO', icon:'espresso', steps:'Grind beans → tamp the grounds into the portafilter → dock on the machine with a cup → BREW.'},
   {name:'WATER', icon:'water', steps:'Dock an empty glass on the machine\u2019s right nozzle, press WATER, and stop the pour in the highlighted zone. Click QUEUE to send it to your tray, or drag it straight to a customer.'},
@@ -517,7 +517,7 @@ const RECIPES=[
   {name:'CORTADO', icon:'cortado', steps:'Pull a short espresso shot and cut it with an equal splash of steamed milk — no foam, served small.'},
   {name:'MOCHA', icon:'mocha', steps:'Stir cocoa powder into a fresh espresso shot, then top with steamed milk for a chocolatey latte.'}
 ];
-const NPCS=['npc_b_1','npc_b_2','npc_l_1','npc_w_1','npc_w_2','npc_w_3','npc_w_4','npc_w_5'].map(n=>T+'npc/'+n+'.png');
+const NPCS=[0,1,2,3,4,5,6,7];
 const NAMES=['ALEX','SAM','JO','PAT','LEE','KAI','RAY','MO','TY','CJ','VAL','NIA'];
 const DRINKS=['espresso','americano','latte','mocha','cortado'];
 const ORDER_POOL=[...DRINKS,...DRINKS,'water'];
@@ -527,14 +527,14 @@ const ORDER_TIME=60, SPAWN=9, BREW_T=5, GRIND_T=2.0, STEAM_RATE=0.42, MIN_PER_SE
 const TUT=['','Drag the BEANS into the grinder','Hold GRIND until the beans are ground','Drag the PORTAFILTER onto the grinder to fill it','Drag the TAMP onto the filled portafilter','Drag a CUP into the espresso machine','Dock the tamped PORTAFILTER into the machine','Press BREW','Tap the cup to pour the shot','Drag the ESPRESSO to your customer!'];
 
 function fresh(){return{ day:1, clock:DAY_START, storeOpen:false, money:20, lives:5, beans:8, milk:5, cocoa:5, orders:[], served:0, missed:0, earned:0,
-  grinder:'empty', grindHold:0, porta:'clean', portaOnMachine:false, machineCup:false, machine:'idle', brewProgress:0,
+  grinder:'empty', grindHold:0, porta:'clean', portaOnMachine:false, machineCup:false, machine:'idle', brewProgress:0, brewTarget:1, puckState:'ready',
   drinks:[], milkOnWand:false, steamHold:0, steamedMilk:false, brewShort:false, shopOpen:false, tutStep:0, endServed:0, endMissed:0,
   glassOnMachine:false, glassFilled:false, waterMini:null };}
 const HS_KEY='pixelBrewHighscores';
 const SAVE_KEY='cafecraze_savegame';
 const SAVE_FIELDS=['screen','barista','day','clock','storeOpen','money','lives','beans','milk','cocoa','orders','served','missed','earned',
   'grinder','grindHold','porta','portaOnMachine','machineCup','machine','brewProgress','drinks','milkOnWand','steamHold','steamedMilk',
-  'brewShort','tutStep','endServed','endMissed','glassOnMachine','glassFilled','waterMini'];
+  'brewShort','puckState','brewTarget','tutStep','endServed','endMissed','glassOnMachine','glassFilled','waterMini'];
 function loadSavedGame(){ try{ const raw=JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); return raw&&typeof raw==='object'?raw:null; }catch(e){ return null; } }
 function loadHighscores(){ try{ const raw=JSON.parse(localStorage.getItem(HS_KEY)||'[]'); return Array.isArray(raw)?raw:[]; }catch(e){ return []; } }
 function saveHighscore(days,earned){
@@ -558,8 +558,9 @@ class Component extends DCLogic{
     window.addEventListener('pointercancel',this._pc);
     this._t=setInterval(()=>this.tick(),100); this._last=performance.now();
     const saved=loadSavedGame();
+    if(saved&&Array.isArray(saved.orders)) saved.orders=saved.orders.map(o=>({...o,npc:typeof o.npc==='number'?o.npc:Math.floor(Math.random()*NPC_COUNT)}));
     this.setState({highscores:loadHighscores(), ...(saved||{})});
-    [A.beans,A.cup,A.tamp,A.milk,A.espresso,A.cocoa,A.glass,A.waterglass,A.porta.clean,A.porta.prep,A.porta.tamped,...Object.values(A.drink)].forEach(src=>{const im=new Image();im.src=src;});
+    [A.backdrop,A.overlay,A.gabe,A.daniella,...Object.values(A.sprites)].forEach(src=>{const im=new Image();im.src=src;});
   }
   componentWillUnmount(){clearInterval(this._t);window.removeEventListener('pointermove',this._pm);window.removeEventListener('pointerup',this._pu);window.removeEventListener('pointercancel',this._pc);}
 
@@ -572,7 +573,7 @@ class Component extends DCLogic{
     this.setState(s=>{
       const p={};
       if(this.grinding && s.grinder==='prep'){ let g=s.grindHold+dt/GRIND_T; if(g>=1){this.grinding=false;p.grinder='g3';p.grindHold=0; if(s.tutStep===2)p.tutStep=3;}else p.grindHold=g; }
-      if(s.machine==='brewing'){ let b=s.brewProgress+dt/BREW_T; if(b>=1){p.machine='shot';p.brewProgress=1;}else p.brewProgress=b; }
+      if(s.machine==='brewing'){ let b=s.brewProgress+dt/BREW_T; const target=s.brewTarget??1; if(b>=target){p.machine='shot';p.brewProgress=target; if(target<1){p.brewShort=true;p.puckState='spent';}else{p.brewShort=false;p.puckState='spent';} }else p.brewProgress=b; }
       if(this.steaming && s.milkOnWand){ let st=s.steamHold+dt*STEAM_RATE; p.steamHold=st; if(st>1.28){ this.steaming=false; p.milkOnWand=false; p.steamHold=0; this.toast('Milk scalded! 🔥',true);} }
       if(s.waterMini){ const m=s.waterMini; let pos=m.pos+m.dir*dt*55, dir=m.dir; if(pos>=100){pos=100;dir=-1;} else if(pos<=0){pos=0;dir=1;} p.waterMini={...m,pos,dir}; }
       const tutActive=s.tutStep>0 && s.tutStep<10;
@@ -602,15 +603,22 @@ class Component extends DCLogic{
     if(item==='beans' && this.state.beans<=0){this.toast('Out of beans!',true);return;}
     if(item==='milk' && this.state.milk<=0){this.toast('Out of milk!',true);return;}
     if(item==='cocoa' && this.state.cocoa<=0){this.toast('Out of cocoa!',true);return;}
-    if(item==='porta' && this.state.portaOnMachine){ this.setState({portaOnMachine:false}); }
-    this.dragItem=item; this.moveGhost(e.clientX,e.clientY);
-    this.ghost.src=this.ghostSrc(item); this.ghost.style.display='block';
+    if(item==='porta' && this.state.portaOnMachine){ const reset=this.state.machine==='brewing'||this.state.machine==='paused'; this.setState({portaOnMachine:false,...(reset?{machine:'idle',brewProgress:0}:{})}); }
+    this.dragItem=item;
+    this.ghost.setAttribute('style','position:absolute;left:0;top:0;z-index:100;pointer-events:none;filter:drop-shadow(0 5px 6px rgba(0,0,0,.6));display:block;'+this.ghostStyle(item));
+    this.moveGhost(e.clientX,e.clientY);
     this.setState({draggingItem:item});
     e.preventDefault();
     try{ e.currentTarget.setPointerCapture(e.pointerId); }catch(err){}
   };
-  drinkImg(d){ const dd=this.detect(d); return dd?A.drink[dd]:A.espresso; }
-  ghostSrc(item){const s=this.state;if(item==='drink'){const d=s.drinks[this.dragIdx]; return d?this.drinkImg(d):A.espresso;} return {beans:A.beans,cup:A.cup,tamp:A.tamp,milk:A.milk,steamedmilk:A.milk,cocoa:A.cocoa,porta:A.porta[s.porta],glass:A.glass,waterglass:A.waterglass,shot:A.drink.espresso}[item]||A.beans;}
+  ghostStyle(item){
+    const s=this.state, EX='width:74px;height:auto';
+    if(item==='drink'){ const d=s.drinks[this.dragIdx]; if(d&&d.plainWater)return itemSprite('glassWater',EX); return drinkSprite(this.detect(d)||'espresso',EX); }
+    if(item==='porta') return spriteBg(A.sprites.porta,3,PORTA_FRAMES[s.porta],'844/563',EX);
+    if(item==='shot') return drinkSprite('espresso',EX);
+    const key={beans:'beans',cup:'cup',tamp:'tamp',milk:'milk',steamedmilk:'milk',cocoa:'cocoa',glass:'glassEmpty',waterglass:'glassWater'}[item]||'beans';
+    return itemSprite(key,EX);
+  }
   moveGhost(x,y){
     const r=this.root.getBoundingClientRect();
     const sx=r.width/this.root.offsetWidth, sy=r.height/this.root.offsetHeight;
@@ -626,6 +634,12 @@ class Component extends DCLogic{
     const els=document.elementsFromPoint(e.clientX,e.clientY);
     let drop=null,order=null,dropIdx=null;
     for(const el of els){ if(el.dataset&&el.dataset.drop){drop=el.dataset.drop;order=el.dataset.order;dropIdx=el.dataset.idx;break;} }
+    if(item==='shot'){
+      const targets=drop?drop.split(','):[];
+      if(targets.includes('serve')||targets.includes('ristretto')){ this.handleDrop(item,targets,order,dropIdx); return; }
+      this.takeShot();
+      return;
+    }
     if(drop)this.handleDrop(item,drop.split(','),order,dropIdx);
   }
   onCancel(){ if(!this.dragItem)return; this.dragItem=null; this.ghost.style.display='none'; this.ghost.style.transform='translate(-9999px,-9999px)'; this.setState({draggingItem:null}); }
@@ -635,7 +649,7 @@ class Component extends DCLogic{
     if(item==='porta'&&drops.includes('grinder')){ if(s.porta!=='clean'){this.toast('Portafilter not empty',true);return;} if(['g3','g2','g1'].includes(s.grinder)){ const nx={g3:'g2',g2:'g1',g1:'empty'}[s.grinder]; this.setState({porta:'prep',grinder:nx}); this.tut(3);}else this.toast('No grounds — grind first',true); return; }
     if(item==='tamp'&&drops.includes('porta')){ if(s.porta==='prep'){this.setState({porta:'tamped'});this.tut(4);} else this.toast('Fill the portafilter first',true); return; }
     if(item==='cup'&&drops.includes('machine')){ if(s.machineCup){this.toast('Cup already in',true);return;} if(s.machine==='brewing'||s.machine==='shot'){this.toast('Machine busy',true);return;} this.setState({machineCup:true,machine:'prep'}); this.tut(5); return; }
-    if(item==='porta'&&drops.includes('machine')){ if(s.porta!=='tamped'){this.toast('Tamp the grounds first',true);return;} if(s.portaOnMachine){this.toast('Already docked',true);return;} this.setState({portaOnMachine:true,porta:'clean',machine:'prep'}); this.tut(6); return; }
+    if(item==='porta'&&drops.includes('machine')){ if(s.porta!=='tamped'){this.toast('Tamp the grounds first',true);return;} if(s.portaOnMachine){this.toast('Already docked',true);return;} this.setState({portaOnMachine:true,porta:'clean',machine:'prep',puckState:'ready'}); this.tut(6); return; }
     if(item==='milk'&&drops.includes('wand')){ if(s.milkOnWand||s.steamedMilk)return; if(s.milk<=0){this.toast('Out of milk!',true);return;} this.setState({milkOnWand:true,milk:s.milk-1,steamHold:0}); return; }
     if(item==='glass'&&drops.includes('waterdock')){ if(s.glassOnMachine){this.toast('Nozzle busy',true);return;} this.setState({glassOnMachine:true,glassFilled:false}); return; }
     if(item==='cocoa'&&drops.includes('cocoa')){
@@ -691,14 +705,60 @@ class Component extends DCLogic{
       this.setState(st=>({drinks:st.drinks.filter((_,i)=>i!==idx)})); this.toast('Tossed 🗑️');
       return;
     }
+    if(item==='shot'&&drops.includes('ristretto')){
+      const idx=Number(dropIdx); const t=s.drinks[idx];
+      if(!this.isRistretto(t)){this.toast('Needs another ristretto',true);return;}
+      if(s.machine!=='shot'||!s.brewShort)return;
+      this.setState(st=>{
+        const wasShort=st.brewShort;
+        const drinks=st.drinks.map((d,i)=>i===idx?{...d,short:false}:d);
+        return {drinks,machine:'idle',machineCup:false,brewShort:false,
+          portaOnMachine:(wasShort&&st.puckState!=='spent')?st.portaOnMachine:false,
+          puckState:(wasShort&&st.puckState!=='spent')?'short':'spent'};
+      });
+      this.toast('Combined into an espresso ☕');
+      return;
+    }
+    if(item==='drink'&&drops.includes('ristretto')){
+      const srcIdx=Number(this.dragIdx), tgtIdx=Number(dropIdx);
+      if(srcIdx===tgtIdx)return;
+      const src=s.drinks[srcIdx], tgt=s.drinks[tgtIdx];
+      if(!this.isRistretto(src)||!this.isRistretto(tgt)){this.toast('Needs two ristrettos',true);return;}
+      this.setState(st=>{
+        let drinks=st.drinks.map((d,i)=>i===tgtIdx?{...d,short:false}:d);
+        drinks=drinks.filter((_,i)=>i!==srcIdx);
+        return {drinks};
+      });
+      this.toast('Combined into an espresso ☕');
+      return;
+    }
   }
+  isRistretto(d){ return !!(d&&!d.plainWater&&d.esp&&d.short&&!d.water&&!d.milk&&!d.cocoa); }
   detect(c){ if(!c)return null; if(c.plainWater)return 'water'; if(!c.esp)return null; if(c.milk&&c.cocoa&&!c.water)return 'mocha'; if(c.milk&&!c.water&&!c.cocoa)return c.short?'cortado':'latte'; if(c.water&&!c.milk&&!c.cocoa)return 'americano'; if(!c.water&&!c.milk&&!c.cocoa)return 'espresso'; return null; }
 
   grindDown=(e)=>{ e.preventDefault(); if(this.state.grinder==='prep')this.grinding=true; else if(this.state.grinder==='empty')this.toast('Add beans first',true); };
   grindUp=()=>{ this.grinding=false; };
-  brew=()=>{ const s=this.state; if(s.machine==='brewing')return; if(s.machineCup&&s.portaOnMachine){this.setState({machine:'brewing',brewProgress:0,brewShort:false});this.tut(7);} else this.toast('Need cup + tamped shot',true); };
-  stopBrew=()=>{ const s=this.state; if(s.machine!=='brewing')return; this.setState({machine:'shot',brewShort:s.brewProgress<1}); this.toast('Shot stopped short'); };
-  takeShot=()=>{ const s=this.state; if(s.machine!=='shot')return; if(s.drinks.length>=3){this.toast('Cup rack full!',true);return;} this.setState({drinks:[...s.drinks,{esp:true,water:false,milk:false,short:s.brewShort}],machine:'idle',machineCup:false,brewShort:false}); this.tut(8); };
+  brew=()=>{
+    const s=this.state; if(s.machine==='brewing'||s.machine==='shot')return;
+    if(s.machine==='paused'){ this.setState({machine:'brewing'}); this.tut(7); return; }
+    if(!(s.machineCup&&s.portaOnMachine)){ this.toast('Need cup + tamped shot',true); return; }
+    if(s.puckState==='spent'){ this.toast('Grounds spent — retamp!',true); return; }
+    if(s.puckState==='short'){ this.setState({machine:'brewing',brewProgress:0,brewShort:true,brewTarget:HITBOX_MID}); return; }
+    this.setState({machine:'brewing',brewProgress:0,brewShort:false,brewTarget:1}); this.tut(7);
+  };
+  stopBrew=()=>{
+    const s=this.state; if(s.machine!=='brewing')return; const p=s.brewProgress;
+    if(p<HITBOX_START){ this.setState({machine:'paused'}); this.toast('Paused — hit BREW to continue'); return; }
+    if(p<=HITBOX_END){ this.setState({machine:'shot',brewShort:true,puckState:'short'}); this.toast('Half shot! Perfect for a cortado ☕'); return; }
+    this.setState({machine:'shot',brewShort:false,puckState:'spent'}); this.toast('Full shot pulled');
+  };
+  takeShot=()=>{
+    const s=this.state; if(s.machine!=='shot')return; if(s.drinks.length>=3){this.toast('Cup rack full!',true);return;}
+    const wasShort=s.brewShort;
+    this.setState({drinks:[...s.drinks,{esp:true,water:false,milk:false,short:wasShort}],machine:'idle',machineCup:false,brewShort:false,
+      portaOnMachine: (wasShort&&s.puckState!=='spent')?s.portaOnMachine:false, puckState: (wasShort&&s.puckState!=='spent')?'short':'spent'});
+    this.tut(8);
+  };
   steamDown=(e)=>{ e.preventDefault(); if(this.state.milkOnWand)this.steaming=true; };
   steamUp=()=>{ if(!this.steaming)return; this.steaming=false; const st=this.state.steamHold; if(st>=0.936&&st<=1.092){ this.setState({milkOnWand:false,steamedMilk:true,steamHold:0}); this.toast('Milk steamed! ✨'); } else if(st>0){ this.toast('Keep steaming'); } };
   startWaterPour=()=>{ const s=this.state; if(!s.glassOnMachine||s.glassFilled||s.waterMini)return; const zoneLen=16; const zoneStart=Math.random()*(100-zoneLen); this.setState({waterMini:{pos:0,dir:1,zoneStart,zoneLen}}); };
@@ -741,7 +801,10 @@ class Component extends DCLogic{
   renderVals(){
     const s=this.state;
     const btn=(bg,extra='')=>`font-family:'Silkscreen';font-size:10px;color:#fff;background:${bg};border:2px solid #0d0805;border-radius:7px;padding:7px 9px;cursor:pointer;${extra}`;
-    const mkNpc=(o)=>{ if(!o)return{exists:false}; const pct=Math.max(0,o.t/o.dur); return{exists:true,id:String(o.id),src:o.npc,icon:A.drink[o.drink],name:o.name+' · '+DLABEL[o.drink],pct:(pct*100).toFixed(1)+'%',color:pct<0.25?'#d1495b':pct<0.5?'#e0a020':'#3f9d5a'}; };
+    const mkNpc=(o,hgt)=>{ if(!o)return{exists:false}; const pct=Math.max(0,o.t/o.dur); return{exists:true,id:String(o.id),
+      sprite:npcSprite(o.npc,'height:'+hgt+'%;width:auto;margin:0 auto'),
+      icon:orderIcon(o.drink,'width:30px;height:auto;flex-shrink:0'),
+      name:o.name+' · '+DLABEL[o.drink],pct:(pct*100).toFixed(1)+'%',color:pct<0.25?'#d1495b':pct<0.5?'#e0a020':'#3f9d5a'}; };
     const tutActive=s.tutStep>0&&s.tutStep<10;
     const ringOn=(step)=>tutActive&&s.tutStep===step;
     const ring=(step)=>'position:relative;width:100%;border-radius:10px;'+(ringOn(step)?'animation:pulse 1s ease-in-out infinite;':'');
@@ -753,10 +816,9 @@ class Component extends DCLogic{
       danCardStyle:`width:128px;border-radius:12px;border:3px solid ${s.barista==='daniella'?'#e8b661':'#3a2818'};background:${s.barista==='daniella'?'#2e2013':'#20160e'};cursor:pointer;transition:all .15s`,
       startBtnStyle:`margin-top:20px;font-family:'Silkscreen';font-size:15px;color:#fff;background:#2f6d3f;border:3px solid #0d0805;border-radius:12px;padding:14px 32px;cursor:pointer;box-shadow:0 5px 0 #1c4527`,
       dayNum:s.day, clockLabel:this.clockLabel(), moneyLabel:'$'+s.money, heartsLabel:'♥'.repeat(Math.max(0,s.lives))+'♡'.repeat(Math.max(0,5-s.lives)),
-      beansSrc:A.beans, milkSrc:A.milk, beansNum:s.beans, milkNum:s.milk,
+      beansNum:s.beans, milkNum:s.milk,
       openBtnLabel:s.storeOpen?'CLOSE':'OPEN', toggleStore:this.toggleStore, openBtnStyle:btn(s.storeOpen?'#8a3b1f':'#2f6d3f','font-size:11px;padding:8px 13px'),
-      backdropSrc:A.backdrop, overlaySrc:A.overlay,
-      npc0:mkNpc(s.orders[0]), npc1:mkNpc(s.orders[1]),
+      npc0:mkNpc(s.orders[0],209), npc1:mkNpc(s.orders[1],200),
       storeClosed:!s.storeOpen, openShop:this.openShop,
       ticketStyle:"display:flex;gap:6px;align-items:center;background:#f0e2c8;border:2px solid #0d0805;border-radius:8px;padding:4px 6px;box-shadow:0 3px 5px rgba(0,0,0,.35)",
       grinderSpriteStyle:spriteBg(A.sprites.grinder,6,GRINDER_FRAMES[s.grinder]??0,'258/664','filter:drop-shadow(0 4px 3px rgba(0,0,0,.45))'),
@@ -765,11 +827,14 @@ class Component extends DCLogic{
       grindBtnStyle:btn(s.grinder==='prep'?'#8a3b1f':'#4a3320',(ringOn(2)?'animation:pulse 1s infinite;':'')+'margin-top:4px;font-size:9px;padding:6px 8px'),
       machineSpriteStyle:spriteBg(A.sprites.machine,6,MACHINE_FRAMES[machineKey(s)],'680/673','filter:drop-shadow(0 5px 4px rgba(0,0,0,.5))'), machineRing:ring(6),
       dockedPorta:s.portaOnMachine,
-      milkOnWand:s.milkOnWand, portaOnMachine:s.portaOnMachine, portaTampedSrc:A.porta.tamped,
-      machineCup:s.machineCup, takeShot:this.takeShot,
+      milkOnWand:s.milkOnWand, portaOnMachine:s.portaOnMachine,
+      machineCup:s.machineCup, shotHitboxVisible:s.machineCup&&s.machine==='shot', takeShot:this.takeShot,
       machineCupStyle:`position:absolute;left:40%;top:50%;width:20%;height:32%;cursor:${s.machine==='shot'?'pointer':'default'};border-radius:4px;z-index:2;${s.machine==='shot'?'animation:pulse 1s infinite;':''}`,
-      brewing:s.machine==='brewing', brew:this.brew, brewLabel:s.machine==='brewing'?'BREWING…':'BREW',
-      brewBtnStyle:btn((s.machineCup&&s.portaOnMachine&&s.machine!=='brewing')?'#2f6d3f':'#4a3320',(ringOn(7)?'animation:pulse 1s infinite;':'')+'font-size:10px'),
+      brewing:s.machine==='brewing', brew:this.brew,
+      brewLabel:s.machine==='brewing'?'BREWING…':s.machine==='paused'?'RESUME':'BREW',
+      brewBarVisible:s.machine==='brewing'||s.machine==='paused',
+      hitboxLeft:(HITBOX_START*100).toFixed(1)+'%', hitboxWidth:((HITBOX_END-HITBOX_START)*100).toFixed(1)+'%',
+      brewBtnStyle:btn((s.machine==='paused'||(s.machineCup&&s.portaOnMachine&&s.puckState!=='spent'&&s.machine!=='brewing'&&s.machine!=='shot'))?'#2f6d3f':'#4a3320',(ringOn(7)?'animation:pulse 1s infinite;':'')+'font-size:10px'),
       stopBrew:this.stopBrew, brewPct:(s.brewProgress*100).toFixed(0)+'%', stopBtnStyle:btn('#8a3b1f','font-size:10px'),
       addWater:this.addWater, waterBtnStyle:btn('#3a5570','font-size:10px'),
       steamDown:this.steamDown, steamUp:this.steamUp, steamBtnStyle:btn('#8a3b1f','font-size:10px'),
@@ -805,7 +870,7 @@ class Component extends DCLogic{
       milkHudStyle:spriteBgN(ITEMS_SHEET,A.sprites.items,'milk','width:13px'),
       beansShopStyle:spriteBgN(ITEMS_SHEET,A.sprites.items,'beans','width:30px'),
       milkShopStyle:spriteBgN(ITEMS_SHEET,A.sprites.items,'milk','width:26px'),
-      drinksView:s.drinks.map((dr,i)=>{ const isWater=dr.plainWater; const dd=isWater?'water':this.detect(dr); const sprite=isWater?spriteBgN(ITEMS_SHEET,A.sprites.items,'glassWater','filter:drop-shadow(0 4px 4px rgba(0,0,0,.55))'):spriteBgN(DRINKS_SHEET,A.sprites.drinks,dd||'espresso','filter:drop-shadow(0 4px 4px rgba(0,0,0,.55))'); return { idx:i, sprite, label:dd?DLABEL[dd]:'IN PROGRESS', style:`position:absolute;right:1%;bottom:${2+i*17}%;width:${isWater?10:20}%;z-index:${7+i};cursor:grab;touch-action:none;text-align:center;animation:popin .25s ease-out;${i===s.drinks.length-1&&ringOn(9)?'animation:popin .25s ease-out,pulse 1s infinite;border-radius:10px;':''}` }; }),
+      drinksView:s.drinks.map((dr,i)=>{ const isWater=dr.plainWater; const dd=isWater?'water':this.detect(dr); const sprite=isWater?spriteBgN(ITEMS_SHEET,A.sprites.items,'glassWater','filter:drop-shadow(0 4px 4px rgba(0,0,0,.55))'):spriteBgN(DRINKS_SHEET,A.sprites.drinks,dd||'espresso','filter:drop-shadow(0 4px 4px rgba(0,0,0,.55))'); const label=dd==='espresso'&&dr.short?'RISTRETTO':(dd?DLABEL[dd]:'IN PROGRESS'); const drop='cocoa,milk,water'+(this.isRistretto(dr)?',ristretto':''); return { idx:i, sprite, label, drop, style:`position:absolute;right:1%;bottom:${2+i*17}%;width:${isWater?10:20}%;z-index:${7+i};cursor:grab;touch-action:none;text-align:center;animation:popin .25s ease-out;${i===s.drinks.length-1&&ringOn(9)?'animation:popin .25s ease-out,pulse 1s infinite;border-radius:10px;':''}` }; }),
       menuRecipes:this.menuRecipes, closeRecipes:this.closeRecipes, showRecipes:s.showRecipes,
       recipeRows:RECIPES.map(r=>({name:r.name, steps:r.steps, cocoa:!!r.cocoa,
         iconStyle:r.icon==='water'?spriteBgN(ITEMS_SHEET,A.sprites.items,'glassWater',''):spriteBgN(DRINKS_SHEET,A.sprites.drinks,r.icon,''),
